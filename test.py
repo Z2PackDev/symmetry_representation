@@ -6,7 +6,7 @@
 import numpy as np
 import symmetry_representation as sr
 
-test_1 = sr.SymmetryOperation(rotation_matrix=np.eye(3), repr_matrix=np.eye(2), repr_has_cc=True)
+test_1 = sr.SymmetryOperation(rotation_matrix=np.eye(3), repr_matrix=np.diag([1, 1j]), repr_has_cc=True)
 
 sr.io.save([test_1, test_1, test_1.repr], 'test.hdf5')
 res = sr.io.load('test.hdf5')
