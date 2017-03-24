@@ -12,8 +12,8 @@ except:
     from distutils.core import setup
 
 import sys
-if sys.version_info < (3, 5):
-    raise 'must use Python version 3.5 or higher'
+if sys.version_info < (3, 4):
+    raise 'must use Python version 3.4 or higher'
 
 readme = """A tool to describe symmetry operations and their representation."""
 
@@ -35,6 +35,7 @@ setup(
         'Natural Language :: English',
         'Operating System :: Unix',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Intended Audience :: Science/Research',
