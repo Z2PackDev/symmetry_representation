@@ -5,6 +5,9 @@
 
 from collections import namedtuple
 
+from fsc.export import export
+
+@export
 class SymmetryOperation(namedtuple('SymmetryOperationBase', ['rotation_matrix', 'repr'])):
     """
     Describes a symmetry operation.
@@ -33,6 +36,7 @@ class SymmetryOperation(namedtuple('SymmetryOperationBase', ['rotation_matrix', 
             repr=Representation(matrix=repr_matrix, has_cc=repr_has_cc)
         )
 
+@export
 class Representation(namedtuple('RepresentationBase', ['matrix', 'has_cc'])):
     """
     Describes an (anti-)unitary representation of a symmetry operation.
