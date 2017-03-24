@@ -28,7 +28,7 @@ setup(
     author='Dominik Gresch',
     author_email='greschd@gmx.ch',
     description='Provides an interface to describe symmetry representations.',
-    install_requires=['numpy', 'fsc.export'],
+    install_requires=['numpy', 'fsc.export', 'h5py'],
     long_description=readme,
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
