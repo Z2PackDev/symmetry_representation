@@ -3,7 +3,9 @@
 #
 # Author:  Dominik Gresch <greschd@gmx.ch>
 
-class SymmetryOperation:
+from collections import namedtuple
+
+class SymmetryOperation(namedtuple('SymmetryOperationBase', ['rotation_matrix', 'repr'])):
     """
     Describes a symmetry operation.
 
@@ -24,14 +26,20 @@ class SymmetryOperation:
 
     .. note :: Currently, only point-group symmetries are implemented.
     """
-    def __init__(self, *, rotation_matrix, repr_matrix, repr_has_cc=False):
-        self.rotation_matrix = rotation_matrix
-        self.repr = Representation(matrix=repr_matrix, has_cc=repr_has_cc)
+    def __new__(cls, *, rotation_matrix, repr_matrix, repr_has_cc=False):
+        return super().__new__(
+            cls,
+            rotation_matrix=rotation_matrix,
+            repr=Representation(matrix=repr_matrix, has_cc=repr_has_cc)
+        )
 
-class Representation:
+class Representation(namedtuple('RepresentationBase', ['matrix', 'has_cc'])):
     """
     Describes an (anti-)unitary representation of a symmetry operation.
     """
-    def __init__(self, matrix, has_cc=False):
-        self.matrix = matrix
-        self.has_cc = has_cc
+    def __new__(cls, matrix, has_cc=False):
+        return super().__new__(
+            cls,
+            matrix=matrix,
+            has_cc=has_cc
+        )

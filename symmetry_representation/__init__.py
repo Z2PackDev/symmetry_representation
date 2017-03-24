@@ -3,6 +3,7 @@
 #
 # Author:  Dominik Gresch <greschd@gmx.ch>
 
+from . import io
 from ._sym_op import *
 
 from ._version import __version__
