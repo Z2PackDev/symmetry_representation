@@ -10,7 +10,7 @@ import h5py
 import numpy as np
 from fsc.export import export
 
-from ._sym_op import SymmetryOperation, Representation
+from ._sym_op import SymmetryGroup, SymmetryOperation, Representation
 
 @export
 def save(obj, file_path):
@@ -30,6 +30,11 @@ def _(obj, hf):
         sub_group = hf.create_group(str(i))
         _encode(part, sub_group)
 
+@_encode.register(SymmetryGroup)
+def _(obj, hf):
+    _encode(obj.symmetries, hf.create_group('symmetries'))
+    hf['full_group'] = obj.full_group
+
 @_encode.register(SymmetryOperation)
 def _(obj, hf):
     hf['rotation_matrix'] = np.array(obj.rotation_matrix)
@@ -47,7 +52,9 @@ def load(file_path):
         return _decode(hf)
 
 def _decode(hf):
-    if 'rotation_matrix' in hf:
+    if 'symmetries' in hf:
+        return _decode_symgroup(hf)
+    elif 'rotation_matrix' in hf:
         return _decode_symop(hf)
     elif 'matrix' in hf:
         return _decode_repr(hf)
@@ -56,6 +63,12 @@ def _decode(hf):
 
 def _decode_iterable(hf):
     return [_decode(hf[key]) for key in hf]
+
+def _decode_symgroup(hf):
+    return SymmetryGroup(
+        symmetries=_decode_iterable(hf['symmetries']),
+        full_group=hf['full_group'].value
+    )
 
 def _decode_symop(hf):
     representation = _decode_repr(hf['repr'])

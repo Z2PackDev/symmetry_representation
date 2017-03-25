@@ -8,6 +8,25 @@ from collections import namedtuple
 from fsc.export import export
 
 @export
+class SymmetryGroup(namedtuple('SymmetryGroupBase', ['symmetries', 'full_group'])):
+    """
+    Describes a symmetry group.
+
+    :param symmetries: Elements of the symmetry group.
+    :type symmetries: list(SymmetryOperation)
+
+    :param full_group: Flag which determines whether the symmetry elements describe the full group or just a generating subset.
+    :type full_group: bool
+
+    :ivar symmetries: Elements of the symmetry group.
+    :vartype symmetries: list(SymmetryOperation)
+
+    :ivar full_group: Flag which determines whether the symmetry elements describe the full group or just a generating subset.
+    :vartype full_group: bool
+    """
+    pass
+
+@export
 class SymmetryOperation(namedtuple('SymmetryOperationBase', ['rotation_matrix', 'repr'])):
     """
     Describes a symmetry operation.
