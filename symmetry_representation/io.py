@@ -60,6 +60,8 @@ def _decode(hf):
         return _decode_repr(hf)
     elif '0' in hf:
         return _decode_iterable(hf)
+    else:
+        raise ValueError('File structure not understood.')
 
 def _decode_iterable(hf):
     return [_decode(hf[key]) for key in hf]
