@@ -3,12 +3,13 @@
 #
 # Author:  Dominik Gresch <greschd@gmx.ch>
 
-from collections import namedtuple
+import types
 
+import numpy as np
 from fsc.export import export
 
 @export
-class SymmetryGroup(namedtuple('SymmetryGroupBase', ['symmetries', 'full_group'])):
+class SymmetryGroup(types.SimpleNamespace):
     """
     Describes a symmetry group.
 
@@ -24,10 +25,12 @@ class SymmetryGroup(namedtuple('SymmetryGroupBase', ['symmetries', 'full_group']
     :ivar full_group: Flag which determines whether the symmetry elements describe the full group or just a generating subset.
     :vartype full_group: bool
     """
-    pass
+    def __init__(self, symmetries, full_group=False):
+        self.symmetries = list(symmetries)
+        self.full_group = full_group
 
 @export
-class SymmetryOperation(namedtuple('SymmetryOperationBase', ['rotation_matrix', 'repr'])):
+class SymmetryOperation(types.SimpleNamespace):
     """
     Describes a symmetry operation.
 
@@ -48,21 +51,21 @@ class SymmetryOperation(namedtuple('SymmetryOperationBase', ['rotation_matrix', 
 
     .. note :: Currently, only point-group symmetries are implemented.
     """
-    def __new__(cls, *, rotation_matrix, repr_matrix, repr_has_cc=False):
-        return super().__new__(
-            cls,
-            rotation_matrix=rotation_matrix,
-            repr=Representation(matrix=repr_matrix, has_cc=repr_has_cc)
-        )
+    def __init__(self, *, rotation_matrix, repr_matrix, repr_has_cc=False):
+        self.rotation_matrix = rotation_matrix
+        self.repr = Representation(matrix=repr_matrix, has_cc=repr_has_cc)
+
+    def __eq__(self, val):
+        return np.all(self.rotation_matrix == val.rotation_matrix) and self.repr == val.repr
 
 @export
-class Representation(namedtuple('RepresentationBase', ['matrix', 'has_cc'])):
+class Representation(types.SimpleNamespace):
     """
     Describes an (anti-)unitary representation of a symmetry operation.
     """
-    def __new__(cls, matrix, has_cc=False):
-        return super().__new__(
-            cls,
-            matrix=matrix,
-            has_cc=has_cc
-        )
+    def __init__(self, matrix, has_cc=False):
+        self.matrix = matrix
+        self.has_cc = has_cc
+
+    def __eq__(self, val):
+        return np.all(self.matrix == val.matrix) and self.has_cc == val.has_cc

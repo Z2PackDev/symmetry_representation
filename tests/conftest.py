@@ -6,6 +6,7 @@
 # File:    conftest.py
 
 import json
+
 import pytest
 
 #--------------------------FIXTURES-------------------------------------#
