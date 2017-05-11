@@ -9,8 +9,6 @@ import json
 
 import pytest
 
-#--------------------------FIXTURES-------------------------------------#
-
 @pytest.fixture
 def test_name(request):
     """Returns module_name.function_name for a given test"""

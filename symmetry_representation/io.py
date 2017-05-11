@@ -64,7 +64,7 @@ def _decode(hf):
         raise ValueError('File structure not understood.')
 
 def _decode_iterable(hf):
-    return [_decode(hf[key]) for key in hf]
+    return [_decode(hf[key]) for key in sorted(hf, key=int)]
 
 def _decode_symgroup(hf):
     return SymmetryGroup(
