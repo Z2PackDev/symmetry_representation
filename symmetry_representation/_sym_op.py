@@ -32,7 +32,7 @@ class SymmetryOperation(types.SimpleNamespace):
     """
     Describes a symmetry operation.
 
-    :param rotation_matrix: Real-space rotation matrix of the symmetry.
+    :param rotation_matrix: Real-space rotation matrix of the symmetry (in reduced coordinates).
     :type rotation_matrix: array
 
     :param repr_matrix: Matrix of the representation corresponding to the symmetry operation.
