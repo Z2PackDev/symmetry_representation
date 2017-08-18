@@ -24,7 +24,8 @@ setup(
     author='Dominik Gresch',
     author_email='greschd@gmx.ch',
     description='Provides an interface to describe symmetry representations.',
-    install_requires=['numpy', 'fsc.export', 'h5py'],
+    install_requires=['numpy', 'fsc.export', 'h5py', 'pymatgen'],
+    extras_require={'test': ['pytest', 'pytest-cov']},
     long_description=readme,
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
