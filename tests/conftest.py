@@ -1,9 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import json
 
 import pytest
+
+@pytest.fixture
+def sample():
+    def inner(name):
+        return os.path.join(
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), 'samples'),
+            name
+        )
+    return inner
 
 @pytest.fixture
 def test_name(request):
