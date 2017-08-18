@@ -5,17 +5,34 @@ import pymatgen as mg
 import symmetry_representation as sr
 
 @pytest.fixture
-def all_symmetries(sample):
-    symmetry, group = sr.io.load(sample('symmetries.hdf5'))
+def unstrained_structure(sample):
+    return mg.Structure.from_file(sample('POSCAR'))
+
+@pytest.fixture
+def strained_structure(sample):
+    return mg.Structure.from_file(sample('POSCAR_110_bi_0.04'))
+
+@pytest.fixture(params=[False, True])
+def structure(request, unstrained_structure, strained_structure):
+    if request.param:
+        return strained_structure
+    else:
+        return unstrained_structure
+
+@pytest.fixture
+def symmetries_file_content(sample):
+    return sr.io.load(sample('symmetries.hdf5'))
+
+@pytest.fixture
+def all_symmetries(sample, symmetries_file_content):
+    symmetry, group = symmetries_file_content
     return [symmetry] + group.symmetries
 
-def test_is_compatible(sample, all_symmetries):
-    structure = mg.Structure.from_file(sample('POSCAR'))
+def test_is_compatible(unstrained_structure, all_symmetries):
     for sym in all_symmetries:
-        assert sr.is_compatible(structure=structure, symmetry=sym)
+        assert sr.is_compatible(structure=unstrained_structure, symmetry=sym)
 
-def test_not_all_compatible(sample, all_symmetries):
-    structure = mg.Structure.from_file(sample('POSCAR_110_bi_0.04'))
+def test_not_all_compatible(strained_structure, all_symmetries):
     compatible_rotations = [
         np.eye(3),
         np.array([[0, 1, 0], [1, 0, 0], [-1, -1, -1]]),
@@ -29,4 +46,28 @@ def test_not_all_compatible(sample, all_symmetries):
         return False
 
     for sym in all_symmetries:
-        assert sr.is_compatible(structure=structure, symmetry=sym) == check(sym)
+        assert sr.is_compatible(structure=strained_structure, symmetry=sym) == check(sym)
+
+def test_filter_compatible(unstrained_structure, all_symmetries):
+    assert (
+        len(
+            sr.filter_compatible(
+                all_symmetries,
+                structure=unstrained_structure
+            )
+        ) == len(all_symmetries)
+    )
+
+def test_filter_compatible_strained(strained_structure, all_symmetries):
+    assert (
+        len(
+            sr.filter_compatible(
+                all_symmetries,
+                structure=strained_structure
+            )
+        ) == 5
+    )
+
+def test_nested_filter(structure, symmetries_file_content):
+    print(structure)
+    sr.filter_compatible(symmetries_file_content, structure=structure)
