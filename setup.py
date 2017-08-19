@@ -24,7 +24,7 @@ setup(
     author='Dominik Gresch',
     author_email='greschd@gmx.ch',
     description='Provides an interface to describe symmetry representations.',
-    install_requires=['numpy', 'fsc.export', 'h5py', 'pymatgen'],
+    install_requires=['numpy', 'fsc.export', 'h5py', 'pymatgen', 'click'],
     extras_require={'test': ['pytest', 'pytest-cov']},
     long_description=readme,
     classifiers=[
@@ -40,5 +40,9 @@ setup(
         'Development Status :: 4 - Beta'
     ],
     license='GPL',
-    packages=['symmetry_representation']
+    packages=['symmetry_representation'],
+    entry_points='''
+        [console_scripts]
+        symmetry-repr=symmetry_representation._cli:cli
+    ''',
 )
