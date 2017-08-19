@@ -6,6 +6,8 @@ import json
 
 import pytest
 
+import symmetry_representation as sr
+
 @pytest.fixture
 def sample():
     def inner(name):
@@ -42,3 +44,19 @@ def compare_data(request, test_name, scope="session"):
 @pytest.fixture
 def compare_equal(compare_data):
     return lambda data, tag=None: compare_data(lambda x, y: x == y, data, tag)
+
+@pytest.fixture
+def symmetries_file(sample):
+    return sample('symmetries.hdf5')
+
+@pytest.fixture
+def symmetries_file_content(symmetries_file):
+    return sr.io.load(symmetries_file)
+
+@pytest.fixture
+def unstrained_poscar(sample):
+    return sample('POSCAR')
+
+@pytest.fixture
+def strained_poscar(sample):
+    return sample('POSCAR_110_bi_0.04')

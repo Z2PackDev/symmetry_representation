@@ -5,12 +5,12 @@ import pymatgen as mg
 import symmetry_representation as sr
 
 @pytest.fixture
-def unstrained_structure(sample):
-    return mg.Structure.from_file(sample('POSCAR'))
+def unstrained_structure(unstrained_poscar):
+    return mg.Structure.from_file(unstrained_poscar)
 
 @pytest.fixture
-def strained_structure(sample):
-    return mg.Structure.from_file(sample('POSCAR_110_bi_0.04'))
+def strained_structure(strained_poscar):
+    return mg.Structure.from_file(strained_poscar)
 
 @pytest.fixture(params=[False, True])
 def structure(request, unstrained_structure, strained_structure):
@@ -18,10 +18,6 @@ def structure(request, unstrained_structure, strained_structure):
         return strained_structure
     else:
         return unstrained_structure
-
-@pytest.fixture
-def symmetries_file_content(sample):
-    return sr.io.load(sample('symmetries.hdf5'))
 
 @pytest.fixture
 def all_symmetries(sample, symmetries_file_content):
