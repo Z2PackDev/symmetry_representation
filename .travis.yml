@@ -1,16 +1,22 @@
 language: python
 cache: pip
-sudo: true
 python:
-    - "3.4"
-    - "3.5"
-    - "3.6"
-    - "3.6-dev"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.6-dev"
 
 install:
-    - pip install .[test]
+  - pip install .[dev]
 
-# run tests
 script:
-    - cd tests
-    - py.test
+  - cd tests
+  - py.test
+
+jobs:
+  include:
+    - stage: compliance
+      script: pre-commit run --all-files
+stages:
+  - compliance
+  - test

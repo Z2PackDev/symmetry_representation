@@ -10,6 +10,7 @@ from fsc.export import export
 
 from . import SymmetryGroup, SymmetryOperation
 
+
 @export
 def is_compatible(*, structure, symmetry):
     """
@@ -30,10 +31,14 @@ def is_compatible(*, structure, symmetry):
             return True
     return False
 
+
 @export
 @singledispatch
 def filter_compatible(symmetries, *, structure):
-    raise ValueError("Unrecognized type '{}' for 'symmetries'".format(type(symmetries)))
+    raise ValueError(
+        "Unrecognized type '{}' for 'symmetries'".format(type(symmetries))
+    )
+
 
 @filter_compatible.register(Iterable)
 def _(symmetries, *, structure):
@@ -42,6 +47,7 @@ def _(symmetries, *, structure):
     ]
     return [s for s in filtered_syms if s is not None]
 
+
 @filter_compatible.register(SymmetryOperation)
 def _(symmetry, *, structure):
     if is_compatible(symmetry=symmetry, structure=structure):
@@ -49,13 +55,15 @@ def _(symmetry, *, structure):
     else:
         return None
 
+
 @filter_compatible.register(SymmetryGroup)
 def _(symmetry_group, *, structure):
-    filtered_syms = filter_compatible(symmetry_group.symmetries, structure=structure)
+    filtered_syms = filter_compatible(
+        symmetry_group.symmetries, structure=structure
+    )
     if filtered_syms:
         return SymmetryGroup(
-            symmetries=filtered_syms,
-            full_group=symmetry_group.full_group
+            symmetries=filtered_syms, full_group=symmetry_group.full_group
         )
     else:
         return None

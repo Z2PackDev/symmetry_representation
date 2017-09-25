@@ -16,15 +16,14 @@ SYM_OP = sr.SymmetryOperation(
 REPR_MATRIX = sr.Representation(matrix=np.array([[1j, 0], [-2j, 3j]]))
 SYM_GROUP = sr.SymmetryGroup(symmetries=[SYM_OP, SYM_OP], full_group=True)
 
-@pytest.mark.parametrize('data',[
-    SYM_OP,
-    [SYM_OP],
-    REPR_MATRIX,
-    [REPR_MATRIX],
-    [SYM_OP, [SYM_OP], REPR_MATRIX],
-    SYM_GROUP,
-    [SYM_GROUP, SYM_OP, REPR_MATRIX]
-])
+
+@pytest.mark.parametrize(
+    'data', [
+        SYM_OP, [SYM_OP], REPR_MATRIX, [REPR_MATRIX],
+        [SYM_OP, [SYM_OP],
+         REPR_MATRIX], SYM_GROUP, [SYM_GROUP, SYM_OP, REPR_MATRIX]
+    ]
+)
 def test_save_load(data):
     with tempfile.NamedTemporaryFile() as f:
         print(data)
