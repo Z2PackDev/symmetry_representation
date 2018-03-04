@@ -24,7 +24,9 @@ setup(
     author='Dominik Gresch',
     author_email='greschd@gmx.ch',
     description='Provides an interface to describe symmetry representations.',
-    install_requires=['numpy', 'fsc.export', 'h5py', 'pymatgen', 'click'],
+    install_requires=[
+        'numpy', 'fsc.export', 'fsc.hdf5-io', 'h5py', 'pymatgen', 'click'
+    ],
     extras_require={'dev': ['pytest', 'pytest-cov', 'yapf', 'pre-commit']},
     long_description=readme,
     classifiers=[

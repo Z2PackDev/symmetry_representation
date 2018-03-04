@@ -19,6 +19,7 @@ MANIFEST
 files*.txt
 
 # pytest
+.pytest_cache
 .cache/v/cache
 tests/.cache
 htmlcov

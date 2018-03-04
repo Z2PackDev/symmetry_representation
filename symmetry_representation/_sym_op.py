@@ -5,10 +5,12 @@ import types
 
 import numpy as np
 from fsc.export import export
+from fsc.hdf5_io import subscribe_hdf5, HDF5Enabled, to_hdf5, from_hdf5
 
 
 @export
-class SymmetryGroup(types.SimpleNamespace):
+@subscribe_hdf5('symmetry_representation.symmetry_group')
+class SymmetryGroup(HDF5Enabled, types.SimpleNamespace):
     """
     Describes a symmetry group.
 
@@ -29,9 +31,21 @@ class SymmetryGroup(types.SimpleNamespace):
         self.symmetries = list(symmetries)
         self.full_group = full_group
 
+    def to_hdf5(self, hdf5_handle):
+        to_hdf5(self.symmetries, hdf5_handle.create_group('symmetries'))
+        hdf5_handle['full_group'] = self.full_group
+
+    @classmethod
+    def from_hdf5(cls, hdf5_handle):
+        return cls(
+            symmetries=from_hdf5(hdf5_handle['symmetries']),
+            full_group=hdf5_handle['full_group'].value
+        )
+
 
 @export
-class SymmetryOperation(types.SimpleNamespace):
+@subscribe_hdf5('symmetry_representation.symmetry_operation')
+class SymmetryOperation(HDF5Enabled, types.SimpleNamespace):
     """
     Describes a symmetry operation.
 
@@ -62,9 +76,24 @@ class SymmetryOperation(types.SimpleNamespace):
             self.rotation_matrix == val.rotation_matrix
         ) and self.repr == val.repr
 
+    def to_hdf5(self, hdf5_handle):
+        hdf5_handle['rotation_matrix'] = np.array(self.rotation_matrix)
+        repr_hf = hdf5_handle.create_group('repr')
+        to_hdf5(self.repr, repr_hf)
+
+    @classmethod
+    def from_hdf5(cls, hdf5_handle):
+        representation = Representation.from_hdf5(hdf5_handle['repr'])
+        return cls(
+            rotation_matrix=np.array(hdf5_handle['rotation_matrix']),
+            repr_matrix=representation.matrix,
+            repr_has_cc=representation.has_cc
+        )
+
 
 @export
-class Representation(types.SimpleNamespace):
+@subscribe_hdf5('symmetry_representation.representation')
+class Representation(HDF5Enabled, types.SimpleNamespace):
     """
     Describes an (anti-)unitary representation of a symmetry operation.
     """
@@ -75,3 +104,14 @@ class Representation(types.SimpleNamespace):
 
     def __eq__(self, val):
         return np.all(self.matrix == val.matrix) and self.has_cc == val.has_cc
+
+    @classmethod
+    def from_hdf5(cls, hdf5_handle):
+        return cls(
+            matrix=np.array(hdf5_handle['matrix']),
+            has_cc=hdf5_handle['has_cc'].value
+        )
+
+    def to_hdf5(self, hdf5_handle):
+        hdf5_handle['has_cc'] = self.has_cc
+        hdf5_handle['matrix'] = np.array(self.matrix)
