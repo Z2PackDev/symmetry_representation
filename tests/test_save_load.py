@@ -19,9 +19,9 @@ SYM_GROUP = sr.SymmetryGroup(symmetries=[SYM_OP, SYM_OP], full_group=True)
 
 @pytest.mark.parametrize(
     'data', [
-        SYM_OP, [SYM_OP], REPR_MATRIX, [REPR_MATRIX],
-        [SYM_OP, [SYM_OP],
-         REPR_MATRIX], SYM_GROUP, [SYM_GROUP, SYM_OP, REPR_MATRIX]
+        SYM_OP, [SYM_OP], REPR_MATRIX, [REPR_MATRIX], [
+            SYM_OP, [SYM_OP], REPR_MATRIX
+        ], SYM_GROUP, [SYM_GROUP, SYM_OP, REPR_MATRIX]
     ]
 )
 def test_save_load(data):
@@ -30,3 +30,13 @@ def test_save_load(data):
         sr.io.save(data, f.name)
         result = sr.io.load(f.name)
         np.testing.assert_equal(result, data)
+
+
+@pytest.mark.parametrize(
+    'sample_name', ['symmetries.hdf5', 'symmetries_old.hdf5']
+)
+def test_load_samples(sample, sample_name):
+    res = sr.io.load(sample(sample_name))
+    assert isinstance(res, list)
+    assert isinstance(res[0], sr.SymmetryOperation)
+    assert isinstance(res[1], sr.SymmetryGroup)

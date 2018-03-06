@@ -57,8 +57,9 @@ def test_not_all_compatible(strained_structure, all_symmetries):
 def test_filter_compatible(unstrained_structure, all_symmetries):
     assert (
         len(
-            sr.
-            filter_compatible(all_symmetries, structure=unstrained_structure)
+            sr.filter_compatible(
+                all_symmetries, structure=unstrained_structure
+            )
         ) == len(all_symmetries)
     )
 
