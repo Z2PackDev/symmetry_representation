@@ -27,7 +27,12 @@ setup(
     install_requires=[
         'numpy', 'fsc.export', 'fsc.hdf5-io', 'h5py', 'pymatgen', 'click'
     ],
-    extras_require={'dev': ['pytest', 'pytest-cov', 'yapf', 'pre-commit']},
+    extras_require={
+        'dev': [
+            'pytest', 'pytest-cov', 'yapf', 'pre-commit', 'sphinx',
+            'sphinx-rtd-theme', 'sphinx-click'
+        ]
+    },
     long_description=readme,
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',

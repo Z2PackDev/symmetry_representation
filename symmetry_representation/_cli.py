@@ -35,6 +35,9 @@ def cli():
     help='File where the filtered symmetries are written (in HDF5 format).'
 )
 def filter_symmetries(symmetries, lattice, output):
+    """
+    Selects symmetries which are compatible with the given lattice.
+    """
     click.echo(
         "Loading initial symmetries from file '{}'...".format(symmetries)
     )

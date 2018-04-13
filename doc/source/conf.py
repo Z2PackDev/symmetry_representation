@@ -33,15 +33,19 @@ import symmetry_representation
 # ones.
 extensions = [
     'sphinx.ext.todo', 'sphinx.ext.autodoc', 'sphinx.ext.mathjax',
-    'sphinx.ext.viewcode', 'sphinx.ext.intersphinx'
+    'sphinx.ext.viewcode', 'sphinx.ext.intersphinx', 'sphinx_click.ext'
 ]
 
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'sympy': ('http://docs.sympy.org/latest', None),
+    'pymatgen': ('http://pymatgen.org', None),
 }
 
 todo_include_todos = True
+
+nitpick_ignore = [('py:class', 'array'), ('py:obj', 'symmetries'),
+                  ('py:obj', 'full_group'), ('py:obj', 'rotation_matrix')]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
