@@ -5,12 +5,12 @@ import types
 
 import numpy as np
 from fsc.export import export
-from fsc.hdf5_io import subscribe_hdf5, HDF5Enabled, to_hdf5, from_hdf5
+from fsc.hdf5_io import subscribe_hdf5, SimpleHDF5Mapping
 
 
 @export
 @subscribe_hdf5('symmetry_representation.symmetry_group')
-class SymmetryGroup(HDF5Enabled, types.SimpleNamespace):
+class SymmetryGroup(SimpleHDF5Mapping, types.SimpleNamespace):
     """
     Describes a symmetry group.
 
@@ -26,26 +26,16 @@ class SymmetryGroup(HDF5Enabled, types.SimpleNamespace):
     :ivar full_group: Flag which determines whether the symmetry elements describe the full group or just a generating subset.
     :vartype full_group: bool
     """
+    HDF5_ATTRIBUTES = ['symmetries', 'full_group']
 
     def __init__(self, symmetries, full_group=False):
         self.symmetries = list(symmetries)
         self.full_group = full_group
 
-    def to_hdf5(self, hdf5_handle):
-        to_hdf5(self.symmetries, hdf5_handle.create_group('symmetries'))
-        hdf5_handle['full_group'] = self.full_group
-
-    @classmethod
-    def from_hdf5(cls, hdf5_handle):
-        return cls(
-            symmetries=from_hdf5(hdf5_handle['symmetries']),
-            full_group=hdf5_handle['full_group'].value
-        )
-
 
 @export
 @subscribe_hdf5('symmetry_representation.symmetry_operation')
-class SymmetryOperation(HDF5Enabled, types.SimpleNamespace):
+class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
     """
     Describes a symmetry operation.
 
@@ -70,6 +60,8 @@ class SymmetryOperation(HDF5Enabled, types.SimpleNamespace):
     .. note :: Currently, only point-group symmetries are implemented.
     """
 
+    HDF5_ATTRIBUTES = ['real_space_operator', 'repr']
+
     def __init__(
         self,
         *,
@@ -78,24 +70,43 @@ class SymmetryOperation(HDF5Enabled, types.SimpleNamespace):
         translation_vector=None,
         repr_has_cc=False
     ):
-        self.rotation_matrix = rotation_matrix
+        self.real_space_operator = RealSpaceOperator(
+            rotation_matrix=rotation_matrix,
+            translation_vector=translation_vector
+        )
         self.repr = Representation(matrix=repr_matrix, has_cc=repr_has_cc)
 
-    def __eq__(self, val):
-        return np.all(
-            self.rotation_matrix == val.rotation_matrix
-        ) and self.repr == val.repr
+    @property
+    def rotation_matrix(self):
+        return self.real_space_operator.rotation_matrix
 
-    def to_hdf5(self, hdf5_handle):
-        hdf5_handle['rotation_matrix'] = np.array(self.rotation_matrix)
-        repr_hf = hdf5_handle.create_group('repr')
-        to_hdf5(self.repr, repr_hf)
+    @property
+    def translation_vector(self):
+        return self.real_space_operator.translation_vector
+
+    def __eq__(self, other):
+        return (
+            self.real_space_operator == other.real_space_operator
+            and self.repr == other.repr
+        )
 
     @classmethod
     def from_hdf5(cls, hdf5_handle):
+        if 'real_space_operator' in hdf5_handle:
+            real_space_operator = RealSpaceOperator.from_hdf5(
+                hdf5_handle['real_space_operator']
+            )
+            rotation_matrix = real_space_operator.rotation_matrix
+            translation_vector = real_space_operator.translation_vector
+        # handle old version without RealSpaceOperator
+        else:
+            rotation_matrix = np.array(hdf5_handle['rotation_matrix'])
+            translation_vector = None
+
         representation = Representation.from_hdf5(hdf5_handle['repr'])
         return cls(
-            rotation_matrix=np.array(hdf5_handle['rotation_matrix']),
+            rotation_matrix=rotation_matrix,
+            translation_vector=translation_vector,
             repr_matrix=representation.matrix,
             repr_has_cc=representation.has_cc
         )
@@ -103,16 +114,18 @@ class SymmetryOperation(HDF5Enabled, types.SimpleNamespace):
 
 @export
 @subscribe_hdf5('symmetry_representation.real_space_operator')
-class RealSpaceOperator(HDF5Enabled, types.SimpleNamespace):
+class RealSpaceOperator(SimpleHDF5Mapping, types.SimpleNamespace):
     """
     Describes the real-space operator of a symmetry operation.
     """
 
+    HDF5_ATTRIBUTES = ['rotation_matrix', 'translation_vector']
+
     def __init__(self, rotation_matrix, translation_vector=None):
         self.rotation_matrix = rotation_matrix
-        self.translation_vector = translation_vector or np.zeros(
-            len(self.rotation_matrix)
-        )
+        if translation_vector is None:
+            translation_vector = np.zeros(len(self.rotation_matrix))
+        self.translation_vector = translation_vector
 
     def __matmul__(self, r):
         return self.apply(r)
@@ -123,12 +136,6 @@ class RealSpaceOperator(HDF5Enabled, types.SimpleNamespace):
         """
         return self.rotation_matrix @ r + self.translation_vector
 
-    def apply_reciprocal(self, k):
-        """
-        Apply the symmetry operation to a vector in reduced reciprocal-space coordinates.
-        """
-        raise NotImplementedError
-
     def __eq__(self, other):
         return np.all(
             self.rotation_matrix == other.rotation_matrix
@@ -137,10 +144,11 @@ class RealSpaceOperator(HDF5Enabled, types.SimpleNamespace):
 
 @export
 @subscribe_hdf5('symmetry_representation.representation')
-class Representation(HDF5Enabled, types.SimpleNamespace):
+class Representation(SimpleHDF5Mapping, types.SimpleNamespace):
     """
     Describes an (anti-)unitary representation of a symmetry operation.
     """
+    HDF5_ATTRIBUTES = ['matrix', 'has_cc']
 
     def __init__(self, matrix, has_cc=False):
         self.matrix = matrix
@@ -148,14 +156,3 @@ class Representation(HDF5Enabled, types.SimpleNamespace):
 
     def __eq__(self, val):
         return np.all(self.matrix == val.matrix) and self.has_cc == val.has_cc
-
-    @classmethod
-    def from_hdf5(cls, hdf5_handle):
-        return cls(
-            matrix=np.array(hdf5_handle['matrix']),
-            has_cc=hdf5_handle['has_cc'].value
-        )
-
-    def to_hdf5(self, hdf5_handle):
-        hdf5_handle['has_cc'] = self.has_cc
-        hdf5_handle['matrix'] = np.array(self.matrix)

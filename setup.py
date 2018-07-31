@@ -25,7 +25,7 @@ setup(
     author_email='greschd@gmx.ch',
     description='Provides an interface to describe symmetry representations.',
     install_requires=[
-        'numpy', 'fsc.export', 'fsc.hdf5-io', 'h5py', 'pymatgen', 'click'
+        'numpy', 'fsc.export', 'fsc.hdf5-io>=0.3', 'h5py', 'pymatgen', 'click'
     ],
     extras_require={
         'dev': [
