@@ -55,11 +55,14 @@ class SymmetryOperation(HDF5Enabled, types.SimpleNamespace):
     :param repr_matrix: Matrix of the representation corresponding to the symmetry operation.
     :type repr_matrix: array
 
+    :param translation_vector: Real-space displacement vector of the symmetry (in reduced coordinates).
+    :type translation_vector: array
+
     :param repr_has_cc: Specifies whether the representation contains a complex conjugation.
     :type repr_has_cc: bool
 
-    :ivar rotation_matrix: Real-space rotation matrix.
-    :vartype rotation_matrix: array
+    :ivar real_space_operator: Real-space operator of the symmetry.
+    :vartype real_space_operator: :class:`.RealSpaceOperator`
 
     :ivar repr: Symmetry representation.
     :vartype repr: :class:`.Representation`
@@ -67,7 +70,14 @@ class SymmetryOperation(HDF5Enabled, types.SimpleNamespace):
     .. note :: Currently, only point-group symmetries are implemented.
     """
 
-    def __init__(self, *, rotation_matrix, repr_matrix, repr_has_cc=False):
+    def __init__(
+        self,
+        *,
+        rotation_matrix,
+        repr_matrix,
+        translation_vector=None,
+        repr_has_cc=False
+    ):
         self.rotation_matrix = rotation_matrix
         self.repr = Representation(matrix=repr_matrix, has_cc=repr_has_cc)
 
@@ -89,6 +99,40 @@ class SymmetryOperation(HDF5Enabled, types.SimpleNamespace):
             repr_matrix=representation.matrix,
             repr_has_cc=representation.has_cc
         )
+
+
+@export
+@subscribe_hdf5('symmetry_representation.real_space_operator')
+class RealSpaceOperator(HDF5Enabled, types.SimpleNamespace):
+    """
+    Describes the real-space operator of a symmetry operation.
+    """
+
+    def __init__(self, rotation_matrix, translation_vector=None):
+        self.rotation_matrix = rotation_matrix
+        self.translation_vector = translation_vector or np.zeros(
+            len(self.rotation_matrix)
+        )
+
+    def __matmul__(self, r):
+        return self.apply(r)
+
+    def apply(self, r):
+        """
+        Apply symmetry operation to a vector in reduced real-space coordinates.
+        """
+        return self.rotation_matrix @ r + self.translation_vector
+
+    def apply_reciprocal(self, k):
+        """
+        Apply the symmetry operation to a vector in reduced reciprocal-space coordinates.
+        """
+        raise NotImplementedError
+
+    def __eq__(self, other):
+        return np.all(
+            self.rotation_matrix == other.rotation_matrix
+        ) and np.all(self.translation_vector == other.translation_vector)
 
 
 @export
