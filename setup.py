@@ -4,7 +4,7 @@
 import re
 try:
     from setuptools import setup
-except:
+except ImportError:
     from distutils.core import setup
 
 import sys
@@ -31,7 +31,7 @@ setup(
     extras_require={
         'dev': [
             'pytest', 'pytest-cov', 'yapf', 'pre-commit', 'sphinx',
-            'sphinx-rtd-theme', 'sphinx-click'
+            'sphinx-rtd-theme', 'sphinx-click', 'prospector', 'pylint'
         ]
     },
     long_description=readme,
