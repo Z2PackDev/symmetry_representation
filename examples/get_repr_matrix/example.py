@@ -38,8 +38,11 @@ symops = analyzer.get_symmetry_operations(cartesian=False)
 symops_cart = analyzer.get_symmetry_operations(cartesian=True)
 
 for sym_reduced, sym_cart in zip(symops, symops_cart):
-    sr.get_repr_matrix(
-        system=system,
-        real_space_operator=sr.RealSpaceOperator.from_pymatgen(sym_reduced),
-        rotation_matrix_cartesian=sym_cart.rotation_matrix
+    print(
+        sr.get_repr_matrix(
+            system=system,
+            real_space_operator=sr.RealSpaceOperator.
+            from_pymatgen(sym_reduced),
+            rotation_matrix_cartesian=sym_cart.rotation_matrix
+        )
     )
