@@ -154,6 +154,13 @@ class RealSpaceOperator(SimpleHDF5Mapping, types.SimpleNamespace):
             translation_vector = np.zeros(len(self.rotation_matrix))
         self.translation_vector = translation_vector
 
+    @classmethod
+    def from_pymatgen(cls, pymatgen_op):
+        return cls(
+            rotation_matrix=pymatgen_op.rotation_matrix,
+            translation_vector=pymatgen_op.translation_vector
+        )
+
     def __matmul__(self, other):
         if not isinstance(other, RealSpaceOperator):
             raise TypeError(
