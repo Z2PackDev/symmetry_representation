@@ -7,6 +7,8 @@ import numpy as np
 from fsc.export import export
 from fsc.hdf5_io import subscribe_hdf5, SimpleHDF5Mapping
 
+from . import _get_repr_matrix
+
 
 @export
 @subscribe_hdf5('symmetry_representation.symmetry_group')
@@ -75,6 +77,36 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
             translation_vector=translation_vector
         )
         self.repr = Representation(matrix=repr_matrix, has_cc=repr_has_cc)
+
+    @classmethod
+    def from_real_space_operator(cls, *, real_space_operator, **kwargs):
+        return cls(
+            rotation_matrix=real_space_operator.rotation_matrix,
+            translation_vector=real_space_operator.translation_vector,
+            **kwargs
+        )
+
+    @classmethod
+    def from_orbitals(
+        cls,
+        *,
+        orbitals,
+        real_space_operator,
+        rotation_matrix_cartesian,
+        numeric=False,
+        **kwargs
+    ):
+        repr_matrix = _get_repr_matrix.get_repr_matrix(
+            orbitals=orbitals,
+            real_space_operator=real_space_operator,
+            rotation_matrix_cartesian=rotation_matrix_cartesian,
+            numeric=numeric
+        )
+        return cls.from_real_space_operator(
+            real_space_operator=real_space_operator,
+            repr_matrix=repr_matrix,
+            **kwargs
+        )
 
     @property
     def rotation_matrix(self):

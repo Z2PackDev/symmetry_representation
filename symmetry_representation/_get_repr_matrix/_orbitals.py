@@ -1,20 +1,11 @@
 import types
 from fractions import Fraction
+from collections import namedtuple
 
 import sympy as sp
 import numpy as np
 from fsc.export import export
 from fsc.hdf5_io import subscribe_hdf5, SimpleHDF5Mapping
-
-
-# TODO: Maybe remove System class
-@export
-@subscribe_hdf5('symmetry_representation.system')
-class System(SimpleHDF5Mapping, types.SimpleNamespace):
-    HDF5_ATTRIBUTES = ['orbitals']
-
-    def __init__(self, *orbitals):
-        self.orbitals = orbitals
 
 
 @export
@@ -32,27 +23,31 @@ class Orbital(SimpleHDF5Mapping, types.SimpleNamespace):
         self.spin = spin
 
 
+_SpinBase = namedtuple('_SpinBase', ['total', 'z_component'])
+
+
 @export
 @subscribe_hdf5('symmetry_representation.spin')
-class Spin(SimpleHDF5Mapping, types.SimpleNamespace):
+class Spin(SimpleHDF5Mapping, _SpinBase):
     HDF5_ATTRIBUTES = ['total', 'z_component']
 
-    def __init__(self, *, total=Fraction(1, 2), z_component):
-        self.total = Fraction(total)
-        self.z_component = Fraction(z_component)
+    def __new__(cls, total=Fraction(0), z_component=Fraction(0)):
+        total = Fraction(total)
+        z_component = Fraction(z_component)
 
-        for value in [self.total, self.z_component]:
+        for value in [total, z_component]:
             if value.denominator not in [1, 2]:
                 raise ValueError('Invalid value for spin: {}'.format(value))
 
-        if self.total > Fraction(1, 2):
+        if total > Fraction(1, 2):
             raise NotImplementedError(
                 'Spin values larger than 1/2 are not implemented.'
             )
 
-        if ((abs(self.z_component) > self.total)
-            or ((self.total - self.z_component) % 1 != 0)):
+        if ((abs(z_component) > total) or ((total - z_component) % 1 != 0)):
             raise ValueError(
                 'Spin z component {} is incompatible with total spin {}'.
-                format(self.z_component, self.total)
+                format(z_component, total)
             )
+
+        return super().__new__(cls, total=total, z_component=z_component)

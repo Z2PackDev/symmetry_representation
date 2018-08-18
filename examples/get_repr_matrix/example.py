@@ -10,7 +10,7 @@ POS_As = (0.25, 0.25, 0.25)
 SPIN_UP = sr.Spin(total=0.5, z_component=0.5)
 SPIN_DOWN = sr.Spin(total=0.5, z_component=-0.5)
 
-system = sr.System(
+orbitals = [
     sr.Orbital(position=POS_In, function_string='1', spin=SPIN_UP),
     sr.Orbital(position=POS_In, function_string='x', spin=SPIN_UP),
     sr.Orbital(position=POS_In, function_string='y', spin=SPIN_UP),
@@ -25,7 +25,7 @@ system = sr.System(
     sr.Orbital(position=POS_As, function_string='x', spin=SPIN_DOWN),
     sr.Orbital(position=POS_As, function_string='y', spin=SPIN_DOWN),
     sr.Orbital(position=POS_As, function_string='z', spin=SPIN_DOWN),
-)
+]
 
 structure = mg.Structure(
     lattice=[[0., 3.029, 3.029], [3.029, 0., 3.029], [3.029, 3.029, 0.]],
@@ -40,7 +40,7 @@ symops_cart = analyzer.get_symmetry_operations(cartesian=True)
 for sym_reduced, sym_cart in zip(symops, symops_cart):
     print(
         sr.get_repr_matrix(
-            system=system,
+            orbitals=orbitals,
             real_space_operator=sr.RealSpaceOperator.
             from_pymatgen(sym_reduced),
             rotation_matrix_cartesian=sym_cart.rotation_matrix
