@@ -37,7 +37,18 @@ def get_repr_matrix(
             func_basis_reduced = [
                 orbitals[idx].function for idx in res_pos_idx_reduced
             ]
-            func_vec = _expr_to_vector(new_func, basis=func_basis_reduced)
+            func_vec = _expr_to_vector(
+                new_func, basis=func_basis_reduced, numeric=numeric
+            )
+            func_vec_norm = la.norm(np.array(func_vec).astype(complex))
+            if not np.isclose(func_vec_norm, 1):
+                raise ValueError(
+                    'Norm {} of vector {} for expression {} created from orbital {} is not one.\nCartesian rotation matrix: {}'.
+                    format(
+                        func_vec_norm, func_vec, new_func, orb,
+                        rotation_matrix_cartesian
+                    )
+                )
             for idx, func_value in zip(res_pos_idx_reduced, func_vec):
                 repr_matrix[idx, i] += func_value * spin_value
     # check that the matrix is unitary
@@ -46,7 +57,16 @@ def get_repr_matrix(
         repr_matrix_numeric @ repr_matrix_numeric.conj().T,
         np.eye(*repr_matrix_numeric.shape)
     ):
-        raise ValueError('Representation matrix is not unitary.')
+        max_mismatch = np.max(
+            np.abs(
+                repr_matrix_numeric @ repr_matrix_numeric.conj().T -
+                np.eye(*repr_matrix_numeric.shape)
+            )
+        )
+        raise ValueError(
+            'Representation matrix is not unitary. Maximum mismatch to unity: {}'.
+            format(max_mismatch)
+        )
     if numeric:
         return repr_matrix_numeric
     else:
