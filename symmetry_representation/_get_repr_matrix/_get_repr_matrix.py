@@ -6,15 +6,84 @@ import scipy.linalg as la
 
 from fsc.export import export
 
+from .._sym_op import RealSpaceOperator, SymmetryOperation
+
 from ._orbitals import Spin
+from ._orbital_constants import SPIN_UP, SPIN_DOWN
 from ._spin_reps import _spin_reps
 from ._expr_utils import _get_substitution, _expr_to_vector
+
+
+@export
+def get_time_reversal(*, orbitals, numeric=False):
+    """
+    Create the symmetry operation for time-reversal.
+
+    Arguments
+    ---------
+    orbitals : List(Orbital)
+        Basis orbitals with respect to which the representation should be created.
+    numeric : bool
+        Flag to determine whether numeric (numpy) or symbolic (sympy) computation
+        should be used.
+    """
+    dim = len(orbitals[0].position)
+    if numeric:
+        unity = np.eye(dim)
+    else:
+        unity = sp.eye(dim)
+    real_space_operator = RealSpaceOperator(rotation_matrix=unity)
+    repr_matrix = _get_repr_matrix_impl(
+        orbitals=orbitals,
+        real_space_operator=real_space_operator,
+        rotation_matrix_cartesian=unity,
+        spin_rot_function=_apply_spin_time_reversal,
+        numeric=numeric,
+    )
+    return SymmetryOperation.from_real_space_operator(
+        real_space_operator=real_space_operator,
+        repr_matrix=repr_matrix,
+        repr_has_cc=True
+    )
 
 
 @export
 def get_repr_matrix(
     *, orbitals, real_space_operator, rotation_matrix_cartesian, numeric=False
 ):
+    """
+    Create the representation matrix for a unitary operator.
+
+    Arguments
+    ---------
+    orbitals : List(Orbital)
+        Basis orbitals with respect to which the representation should be created.
+    real_space_operator : .RealSpaceOperator
+        Real-space operator of the symmetry operation.
+    rotation_matrix_cartesian : np.array or sp.Matrix
+        Rotation matrix of the symmetry operation in cartesian coordinates.
+    numeric : bool
+        Flag to determine whether numeric (numpy) or symbolic (sympy) computation
+        should be used.
+    """
+    return _get_repr_matrix_impl(
+        orbitals=orbitals,
+        real_space_operator=real_space_operator,
+        rotation_matrix_cartesian=rotation_matrix_cartesian,
+        spin_rot_function=_apply_spin_rotation,
+        numeric=numeric
+    )
+
+
+def _get_repr_matrix_impl(
+    *,
+    orbitals,
+    real_space_operator,
+    rotation_matrix_cartesian,
+    spin_rot_function,
+    numeric=False
+):
+
     orbitals = list(orbitals)
 
     positions_mapping = _get_positions_mapping(
@@ -25,7 +94,7 @@ def get_repr_matrix(
     expr_substitution = _get_substitution(rotation_matrix_cartesian)
     for i, orb in enumerate(orbitals):
         res_pos_idx = positions_mapping[i]
-        spin_res = _apply_spin_rotation(
+        spin_res = spin_rot_function(
             rotation_matrix_cartesian=rotation_matrix_cartesian, spin=orb.spin
         )
 
@@ -92,7 +161,22 @@ def _is_same_position(pos1, pos2):
 def _pos_distance(pos1, pos2):
     delta = np.array(pos1) - np.array(pos2)
     delta %= 1
-    return la.norm(np.minimum(delta, 1 - delta))
+    return la.norm(np.array(np.minimum(delta, 1 - delta)).astype(float))
+
+
+def _apply_spin_time_reversal(*, spin, **kwargs):
+    if spin.total == 0:
+        return {spin: 1}
+
+    # time-reversal is represented by sigma_y * complex conjugation
+    elif spin.total == Fraction(1, 2):
+        if spin == SPIN_UP:
+            return {SPIN_DOWN: 1j}
+        else:
+            assert spin == SPIN_DOWN
+            return {SPIN_UP: -1j}
+    else:
+        raise NotImplementedError('Spins larger than 1/2 are not implemented.')
 
 
 def _apply_spin_rotation(rotation_matrix_cartesian, spin):
@@ -100,7 +184,7 @@ def _apply_spin_rotation(rotation_matrix_cartesian, spin):
         return {spin: 1}
     elif spin.total == Fraction(1, 2):
         spin_vec = _spin_to_vector(spin)
-        spin_vec_res = _spin_reps(rotation_matrix_cartesian) @ spin_vec
+        spin_vec_res = _spin_reps(rotation_matrix_cartesian).dot(spin_vec)
         return _vec_to_spins(spin_vec_res)
     else:
         raise NotImplementedError('Spins larger than 1/2 are not implemented.')

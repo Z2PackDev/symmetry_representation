@@ -7,8 +7,6 @@ import numpy as np
 from fsc.export import export
 from fsc.hdf5_io import subscribe_hdf5, SimpleHDF5Mapping
 
-from . import _get_repr_matrix
-
 
 @export
 @subscribe_hdf5('symmetry_representation.symmetry_group')
@@ -96,6 +94,7 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
         numeric=False,
         **kwargs
     ):
+        from . import _get_repr_matrix
         repr_matrix = _get_repr_matrix.get_repr_matrix(
             orbitals=orbitals,
             real_space_operator=real_space_operator,
@@ -144,7 +143,7 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
             if curr_val.repr.is_identity and curr_val.real_space_operator.is_lattice_translation:
                 return i
             curr_val @= self
-        else:
+        else:  # pylint: disable=useless-else-on-loop
             raise ValueError(
                 'Order of the symmetry operation could not be determined.'
             )
