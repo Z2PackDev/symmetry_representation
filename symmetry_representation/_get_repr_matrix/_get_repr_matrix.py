@@ -15,7 +15,7 @@ from ._expr_utils import _get_substitution, _expr_to_vector
 
 
 @export
-def get_time_reversal(*, orbitals, numeric=False):
+def get_time_reversal(*, orbitals, numeric):
     """
     Create the symmetry operation for time-reversal.
 
@@ -49,7 +49,7 @@ def get_time_reversal(*, orbitals, numeric=False):
 
 @export
 def get_repr_matrix(
-    *, orbitals, real_space_operator, rotation_matrix_cartesian, numeric=False
+    *, orbitals, real_space_operator, rotation_matrix_cartesian, numeric
 ):
     """
     Create the representation matrix for a unitary operator.
@@ -81,7 +81,7 @@ def _get_repr_matrix_impl(
     real_space_operator,
     rotation_matrix_cartesian,
     spin_rot_function,
-    numeric=False
+    numeric
 ):
 
     orbitals = list(orbitals)

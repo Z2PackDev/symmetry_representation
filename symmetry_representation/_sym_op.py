@@ -91,7 +91,7 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
         orbitals,
         real_space_operator,
         rotation_matrix_cartesian,
-        numeric=False,
+        numeric,
         **kwargs
     ):
         from . import _get_repr_matrix

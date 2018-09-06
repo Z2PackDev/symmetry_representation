@@ -21,7 +21,7 @@ def _expr_to_vector(
     basis,
     *,
     random_fct=lambda: random.randint(-100, 100),
-    numeric=False
+    numeric
 ):
     """
     Converts an algebraic (sympy) expression into vector form.
