@@ -2,7 +2,6 @@
 Test that the automatically generated symmetry representations match a reference.
 """
 
-import numpy as np
 from numpy.testing import assert_allclose
 import pymatgen as mg
 import pymatgen.symmetry.analyzer  # pylint: disable=unused-import
@@ -28,15 +27,7 @@ def test_auto_repr(sample):
             for fct in sr.WANNIER_ORBITALS['p']
         ])
 
-    structure = mg.Structure(
-        lattice=[[0., 3.029, 3.029], [3.029, 0., 3.029], [3.029, 3.029, 0.]],
-        species=['In', 'As'],
-        coords=np.array([pos_In, pos_As])
-    )
-
-    analyzer = mg.symmetry.analyzer.SpacegroupAnalyzer(structure)
-    symops = analyzer.get_symmetry_operations(cartesian=False)
-    symops_cart = analyzer.get_symmetry_operations(cartesian=True)
+    symops, symops_cart = mg.loadfn(sample('InAs_symops.json'))
 
     symmetry_group = sr.SymmetryGroup(
         symmetries=[
