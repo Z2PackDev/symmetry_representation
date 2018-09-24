@@ -55,7 +55,6 @@ def _expr_to_vector(
         vec = nl.lstsq(
             np.array(A).astype(complex),
             np.array(b).astype(complex),
-            rcond=None
         )[0]
     else:
         res = sp.linsolve((sp.Matrix(A), sp.Matrix(b)), sp.symbols('a b c'))
