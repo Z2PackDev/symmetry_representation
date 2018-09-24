@@ -30,7 +30,7 @@ setup(
     ],
     extras_require={
         'dev': [
-            'pytest', 'pytest-cov', 'yapf', 'pre-commit', 'sphinx',
+            'pytest', 'pytest-cov', 'yapf==0.24', 'pre-commit', 'sphinx',
             'sphinx-rtd-theme', 'sphinx-click', 'prospector', 'pylint'
         ]
     },

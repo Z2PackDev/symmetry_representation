@@ -25,9 +25,8 @@ def is_compatible(*, structure, symmetry):
     valid_sym_ops = analyzer.get_symmetry_operations(cartesian=False)
     for sym_op in valid_sym_ops:
         if (
-            np.allclose(
-                sym_op.translation_vector, symmetry.translation_vector
-            )
+            np.
+            allclose(sym_op.translation_vector, symmetry.translation_vector)
             and np.allclose(sym_op.rotation_matrix, symmetry.rotation_matrix)
         ):
             return True

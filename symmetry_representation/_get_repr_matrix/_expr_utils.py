@@ -17,11 +17,7 @@ def _get_substitution(rotation_matrix_cartesian):
 
 
 def _expr_to_vector(
-    expr,
-    basis,
-    *,
-    random_fct=lambda: random.randint(-100, 100),
-    numeric
+    expr, basis, *, random_fct=lambda: random.randint(-100, 100), numeric
 ):
     """
     Converts an algebraic (sympy) expression into vector form.
@@ -65,8 +61,8 @@ def _expr_to_vector(
         res = sp.linsolve((sp.Matrix(A), sp.Matrix(b)), sp.symbols('a b c'))
         if len(res) != 1:
             raise ValueError(
-                'Invalid result {res} when trying to match expression {expr} to basis {basis}.'.
-                format(res=res, expr=expr, basis=basis)
+                'Invalid result {res} when trying to match expression {expr} to basis {basis}.'
+                .format(res=res, expr=expr, basis=basis)
             )
         vec = next(iter(res))
         vec = tuple(v.nsimplify() for v in vec)

@@ -76,12 +76,8 @@ def get_repr_matrix(
 
 
 def _get_repr_matrix_impl(
-    *,
-    orbitals,
-    real_space_operator,
-    rotation_matrix_cartesian,
-    spin_rot_function,
-    numeric
+    *, orbitals, real_space_operator, rotation_matrix_cartesian,
+    spin_rot_function, numeric
 ):
 
     orbitals = list(orbitals)
@@ -112,8 +108,8 @@ def _get_repr_matrix_impl(
             func_vec_norm = la.norm(np.array(func_vec).astype(complex))
             if not np.isclose(func_vec_norm, 1):
                 raise ValueError(
-                    'Norm {} of vector {} for expression {} created from orbital {} is not one.\nCartesian rotation matrix: {}'.
-                    format(
+                    'Norm {} of vector {} for expression {} created from orbital {} is not one.\nCartesian rotation matrix: {}'
+                    .format(
                         func_vec_norm, func_vec, new_func, orb,
                         rotation_matrix_cartesian
                     )
@@ -133,8 +129,8 @@ def _get_repr_matrix_impl(
             )
         )
         raise ValueError(
-            'Representation matrix is not unitary. Maximum mismatch to unity: {}'.
-            format(max_mismatch)
+            'Representation matrix is not unitary. Maximum mismatch to unity: {}'
+            .format(max_mismatch)
         )
     if numeric:
         return repr_matrix_numeric

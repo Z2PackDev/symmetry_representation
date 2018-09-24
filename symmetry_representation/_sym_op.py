@@ -86,13 +86,8 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
 
     @classmethod
     def from_orbitals(
-        cls,
-        *,
-        orbitals,
-        real_space_operator,
-        rotation_matrix_cartesian,
-        numeric,
-        **kwargs
+        cls, *, orbitals, real_space_operator, rotation_matrix_cartesian,
+        numeric, **kwargs
     ):
         from . import _get_repr_matrix
         repr_matrix = _get_repr_matrix.get_repr_matrix(

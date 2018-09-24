@@ -1,3 +1,7 @@
+"""
+Defines the command-line tool ``symmetry-repr``.
+"""
+
 import click
 import pymatgen as mg
 
