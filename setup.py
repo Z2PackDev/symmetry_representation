@@ -8,8 +8,8 @@ except ImportError:
     from distutils.core import setup
 
 import sys
-if sys.version_info < (3, 4):
-    raise 'must use Python version 3.4 or higher'
+if sys.version_info < (3, 5):
+    raise 'must use Python version 3.5 or higher'
 
 README = """A tool to describe symmetry operations and their representation."""
 
