@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+Defines functions to determine if symmetries are compatible with a given structure.
+"""
 
 from collections.abc import Iterable
 from functools import singledispatch
@@ -16,10 +19,12 @@ def is_compatible(*, structure, symmetry):
     """
     Checks whether a given symmetry's real space action (rotation + translation vector) is consistent with a given structure.
 
-    :param structure: Structure
-    :type structure: pymatgen.Structure
-
-    :type symmetry: SymmetryOperation
+    Arguments
+    ---------
+    structure : pymatgen.Structure
+        The crystal structure.
+    symmetry : SymmetryOperation
+        The symmetry operation that is checked for compatibility.
     """
     analyzer = mg.symmetry.analyzer.SpacegroupAnalyzer(structure)
     valid_sym_ops = analyzer.get_symmetry_operations(cartesian=False)
@@ -35,14 +40,25 @@ def is_compatible(*, structure, symmetry):
 
 @export
 @singledispatch
-def filter_compatible(symmetries, *, structure):
+def filter_compatible(symmetries, *, structure):  # pylint: disable=unused-argument
+    """
+    Returns the symmetries which are compatible with the given structure.
+
+    Arguments
+    ---------
+    symmetries : SymmetryGroup, Iterable
+        The symmetries which should be checked for compatibility. If a :class:`.SymmetryGroup`
+        is given, the result is also given as a :class:`.SymmetryGroup`.
+    structure : pymatgen.Structure
+        The crystal structure.
+    """
     raise ValueError(
         "Unrecognized type '{}' for 'symmetries'".format(type(symmetries))
     )
 
 
 @filter_compatible.register(Iterable)
-def _(symmetries, *, structure):
+def _(symmetries, *, structure):  # pylint: disable=missing-docstring
     filtered_syms = [
         filter_compatible(s, structure=structure) for s in symmetries
     ]
@@ -50,7 +66,7 @@ def _(symmetries, *, structure):
 
 
 @filter_compatible.register(SymmetryOperation)
-def _(symmetry, *, structure):
+def _(symmetry, *, structure):  # pylint: disable=missing-docstring
     if is_compatible(symmetry=symmetry, structure=structure):
         return symmetry
     else:
@@ -58,8 +74,8 @@ def _(symmetry, *, structure):
 
 
 @filter_compatible.register(SymmetryGroup)
-def _(symmetry_group, *, structure):
-    filtered_syms = filter_compatible(
+def _(symmetry_group, *, structure):  # pylint: disable=missing-docstring
+    filtered_syms = filter_compatible(  # pylint: disable=assignment-from-no-return
         symmetry_group.symmetries, structure=structure
     )
     if filtered_syms:

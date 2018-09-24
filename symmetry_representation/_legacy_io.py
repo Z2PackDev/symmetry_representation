@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-from collections.abc import Iterable
-from functools import singledispatch
+"""
+Defines a decode function to read a legacy HDF5 format.
+"""
 
 import h5py
 import numpy as np
@@ -11,44 +11,48 @@ from ._sym_op import SymmetryGroup, SymmetryOperation, Representation
 
 
 def load(file_path):
-    with h5py.File(file_path, 'r') as hf:
-        return _decode(hf)
+    with h5py.File(file_path, 'r') as hdf5_handle:
+        return _decode(hdf5_handle)
 
 
-def _decode(hf):
-    if 'symmetries' in hf:
-        return _decode_symgroup(hf)
-    elif 'rotation_matrix' in hf:
-        return _decode_symop(hf)
-    elif 'matrix' in hf:
-        return _decode_repr(hf)
-    elif '0' in hf:
-        return _decode_iterable(hf)
+def _decode(hdf5_handle):
+    """
+    Construct the object stored at the given HDF5 location.
+    """
+    if 'symmetries' in hdf5_handle:
+        return _decode_symgroup(hdf5_handle)
+    elif 'rotation_matrix' in hdf5_handle:
+        return _decode_symop(hdf5_handle)
+    elif 'matrix' in hdf5_handle:
+        return _decode_repr(hdf5_handle)
+    elif '0' in hdf5_handle:
+        return _decode_iterable(hdf5_handle)
     else:
         raise ValueError('File structure not understood.')
 
 
-def _decode_iterable(hf):
-    return [_decode(hf[key]) for key in sorted(hf, key=int)]
+def _decode_iterable(hdf5_handle):
+    return [_decode(hdf5_handle[key]) for key in sorted(hdf5_handle, key=int)]
 
 
-def _decode_symgroup(hf):
+def _decode_symgroup(hdf5_handle):
     return SymmetryGroup(
-        symmetries=_decode_iterable(hf['symmetries']),
-        full_group=hf['full_group'].value
+        symmetries=_decode_iterable(hdf5_handle['symmetries']),
+        full_group=hdf5_handle['full_group'].value
     )
 
 
-def _decode_symop(hf):
-    representation = _decode_repr(hf['repr'])
+def _decode_symop(hdf5_handle):
+    representation = _decode_repr(hdf5_handle['repr'])
     return SymmetryOperation(
-        rotation_matrix=np.array(hf['rotation_matrix']),
+        rotation_matrix=np.array(hdf5_handle['rotation_matrix']),
         repr_matrix=representation.matrix,
         repr_has_cc=representation.has_cc
     )
 
 
-def _decode_repr(hf):
+def _decode_repr(hdf5_handle):
     return Representation(
-        matrix=np.array(hf['matrix']), has_cc=hf['has_cc'].value
+        matrix=np.array(hdf5_handle['matrix']),
+        has_cc=hdf5_handle['has_cc'].value
     )

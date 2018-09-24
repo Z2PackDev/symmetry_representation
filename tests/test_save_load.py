@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+Tests for saving and loading ``symmetry-representation`` objects.
+"""
 
 import tempfile
 
@@ -25,6 +28,9 @@ SYM_GROUP = sr.SymmetryGroup(symmetries=[SYM_OP, SYM_OP], full_group=True)
     ]
 )
 def test_save_load(data):
+    """
+    Test that objects are the same after saving and loading.
+    """
     with tempfile.NamedTemporaryFile() as f:
         print(data)
         sr.io.save(data, f.name)
@@ -36,6 +42,9 @@ def test_save_load(data):
     'sample_name', ['symmetries.hdf5', 'symmetries_old.hdf5']
 )
 def test_load_samples(sample, sample_name):
+    """
+    Test loading of given sample files.
+    """
     res = sr.io.load(sample(sample_name))
     assert isinstance(res, list)
     assert isinstance(res[0], sr.SymmetryOperation)

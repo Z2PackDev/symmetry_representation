@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+Defines symmetry operations and groups.
+"""
 
 import types
 
@@ -14,17 +17,19 @@ class SymmetryGroup(SimpleHDF5Mapping, types.SimpleNamespace):
     """
     Describes a symmetry group.
 
-    :param symmetries: Elements of the symmetry group.
-    :type symmetries: list(SymmetryOperation)
+    Arguments
+    ---------
+    symmetries : List[SymmetryOperation]
+        Elements of the symmetry group.
+    full_group : bool
+        Flag which determines whether the symmetry elements describe the full group or just a generating subset.
 
-    :param full_group: Flag which determines whether the symmetry elements describe the full group or just a generating subset.
-    :type full_group: bool
-
-    :ivar symmetries: Elements of the symmetry group.
-    :vartype symmetries: list(SymmetryOperation)
-
-    :ivar full_group: Flag which determines whether the symmetry elements describe the full group or just a generating subset.
-    :vartype full_group: bool
+    Attributes
+    ----------
+    symmetries : List[SymmetryOperation]
+        Elements of the symmetry group.
+    full_group : bool
+        Flag which determines whether the symmetry elements describe the full group or just a generating subset.
     """
     HDF5_ATTRIBUTES = ['symmetries', 'full_group']
 
@@ -39,25 +44,23 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
     """
     Describes a symmetry operation.
 
-    :param rotation_matrix: Real-space rotation matrix of the symmetry (in reduced coordinates).
-    :type rotation_matrix: array
+    Arguments
+    ---------
+    rotation_matrix : array
+        Real-space rotation matrix of the symmetry (in reduced coordinates).
+    repr_matrix : array
+        Matrix of the representation corresponding to the symmetry operation.
+    translation_vector : array
+        Real-space displacement vector of the symmetry (in reduced coordinates).
+    repr_has_cc : bool
+        Specifies whether the representation contains a complex conjugation.
 
-    :param repr_matrix: Matrix of the representation corresponding to the symmetry operation.
-    :type repr_matrix: array
-
-    :param translation_vector: Real-space displacement vector of the symmetry (in reduced coordinates).
-    :type translation_vector: array
-
-    :param repr_has_cc: Specifies whether the representation contains a complex conjugation.
-    :type repr_has_cc: bool
-
-    :ivar real_space_operator: Real-space operator of the symmetry.
-    :vartype real_space_operator: :class:`.RealSpaceOperator`
-
-    :ivar repr: Symmetry representation.
-    :vartype repr: :class:`.Representation`
-
-    .. note :: Currently, only point-group symmetries are implemented.
+    Attributes
+    ----------
+    real_space_operator : RealSpaceOperator
+        Real-space operator of the symmetry.
+    repr : Representation
+        Symmetry representation.
     """
 
     HDF5_ATTRIBUTES = ['real_space_operator', 'repr']
@@ -89,6 +92,24 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
         cls, *, orbitals, real_space_operator, rotation_matrix_cartesian,
         numeric, **kwargs
     ):
+        """
+        Construct a (unitary) symmetry operation from the basis orbitals, real
+        space operator and cartesian rotation matrix. The automatic construction
+        of the representation matrix is used.
+
+        Arguments
+        ---------
+        orbitals : Iterable[Orbital]
+            The basis of orbitals with respect to which the represenation matrix
+            is constructed.
+        real_space_operator : RealSpaceOperator
+            The real space operator of the matrix.
+        rotation_matrix_cartesian : array
+            The rotation matrix of the symmetry, in cartesian coordinates.
+        numeric : bool
+            Determines whether a numeric (numpy) or analytic (sympy)
+            representation matrix is constructed.
+        """
         from . import _get_repr_matrix
         repr_matrix = _get_repr_matrix.get_repr_matrix(
             orbitals=orbitals,
@@ -117,6 +138,9 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
         )
 
     def __matmul__(self, other):
+        """
+        Defines the product of two symmetry operations.
+        """
         if not isinstance(other, SymmetryOperation):
             raise TypeError(
                 'Cannot matrix-multiply objects of type {} and {}'.format(
@@ -133,6 +157,10 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
         )
 
     def get_order(self, max_order=20):
+        """
+        Get the order of a symmetry, i.e. the lowest power to which the symmetry
+        is identity.
+        """
         curr_val = self
         for i in range(1, max_order + 1):
             if curr_val.repr.is_identity and curr_val.real_space_operator.is_lattice_translation:
@@ -170,6 +198,13 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
 class RealSpaceOperator(SimpleHDF5Mapping, types.SimpleNamespace):
     """
     Describes the real-space operator of a symmetry operation.
+
+    Arguments
+    ---------
+    rotation_matrix : array
+        Describes the rotation matrix of the symmetry, in reduced coordinates
+    translation_vector : array
+        The translation vector of the symmetry.
     """
 
     HDF5_ATTRIBUTES = ['rotation_matrix', 'translation_vector']
@@ -188,6 +223,9 @@ class RealSpaceOperator(SimpleHDF5Mapping, types.SimpleNamespace):
         )
 
     def __matmul__(self, other):
+        """
+        Defines the product of real-space operations.
+        """
         if not isinstance(other, RealSpaceOperator):
             raise TypeError(
                 'Cannot matrix-multiply objects of type {} and {}'.format(
@@ -208,6 +246,10 @@ class RealSpaceOperator(SimpleHDF5Mapping, types.SimpleNamespace):
 
     @property
     def is_pure_translation(self):
+        """
+        Checks whether the operation is a pure translation, without rotation or
+        reflection part.
+        """
         n, m = self.rotation_matrix.shape
         if n != m:
             return False
@@ -215,6 +257,10 @@ class RealSpaceOperator(SimpleHDF5Mapping, types.SimpleNamespace):
 
     @property
     def is_lattice_translation(self):
+        """
+        Checks if the operation is a lattice translation, i.e. a pure translation
+        where the translation vector is a lattice vector.
+        """
         return self.is_pure_translation and np.allclose(
             self.translation_vector, np.round(self.translation_vector)
         )
@@ -228,8 +274,19 @@ class RealSpaceOperator(SimpleHDF5Mapping, types.SimpleNamespace):
 @export
 @subscribe_hdf5('symmetry_representation.representation')
 class Representation(SimpleHDF5Mapping, types.SimpleNamespace):
-    """
-    Describes an (anti-)unitary representation of a symmetry operation.
+    r"""
+    Describes an (anti-)unitary representation of a symmetry operation. For
+    unitary symmetry, the representation is given as a unitary matrix :math:`U_g`. For
+    anti-unitary symmetries, it is given as :math:`U_g \hat{K}`, where :math:`\hat{K}` is
+    the complex conjugation operator.
+
+    Arguments
+    ---------
+    matrix : array
+        The unitary matrix of the representation.
+    has_cc : bool
+        Determines whether the representation contains complex conjugation
+        (that is, whether it is anti-unitary).
     """
     HDF5_ATTRIBUTES = ['matrix', 'has_cc']
 
@@ -238,6 +295,9 @@ class Representation(SimpleHDF5Mapping, types.SimpleNamespace):
         self.has_cc = has_cc
 
     def __matmul__(self, other):
+        """
+        Defines the product of representations.
+        """
         if not isinstance(other, Representation):
             raise TypeError(
                 'Cannot matrix-multiply objects of type {} and {}'.format(
@@ -253,6 +313,9 @@ class Representation(SimpleHDF5Mapping, types.SimpleNamespace):
 
     @property
     def is_identity(self):
+        """
+        Checks if a representation is the identity.
+        """
         n, m = self.matrix.shape
         if n != m:
             return False

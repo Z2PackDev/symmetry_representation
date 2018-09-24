@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+A tool for describing symmetry operations and their representations.
+"""
+
+__version__ = '0.2.0'
 
 from . import io
 from ._sym_op import *
 from ._compatibility import *
 from ._get_repr_matrix import *
-
-from ._version import __version__
 
 __all__ = [
     'io'

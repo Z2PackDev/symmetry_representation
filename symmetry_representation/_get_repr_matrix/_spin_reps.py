@@ -2,6 +2,11 @@
 # -*- coding: utf-8 -*-
 #
 # Author:  Georg Winkler, Dominik Gresch <greschd@gmx.ch>
+"""
+Defines the function for getting the spin representation of rotations.
+"""
+
+# pylint: disable=invalid-name
 
 import numpy as np
 import scipy.linalg as la

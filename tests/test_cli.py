@@ -1,6 +1,9 @@
+"""
+Tests for the command-line interface ``symmetry-repr``.
+"""
+
 import tempfile
 
-import pytest
 from click.testing import CliRunner
 
 import symmetry_representation as sr
@@ -8,9 +11,13 @@ from symmetry_representation._cli import cli
 
 
 def test_filter_symmetries_noop(unstrained_poscar, symmetries_file):
+    """
+    Test that filtering symmetries does nothing when the unstrained structure
+    is given.
+    """
     runner = CliRunner()
     with tempfile.NamedTemporaryFile() as out_file:
-        run = runner.invoke(
+        runner.invoke(
             cli, [
                 'filter_symmetries', '-s', symmetries_file, '-l',
                 unstrained_poscar, '-o', out_file.name
@@ -24,9 +31,12 @@ def test_filter_symmetries_noop(unstrained_poscar, symmetries_file):
 
 
 def test_filter_symmetries_strained(strained_poscar, symmetries_file):
+    """
+    Test that filtering symmetries works when a strained structure is given.
+    """
     runner = CliRunner()
     with tempfile.NamedTemporaryFile() as out_file:
-        run = runner.invoke(
+        runner.invoke(
             cli, [
                 'filter_symmetries', '-s', symmetries_file, '-l',
                 strained_poscar, '-o', out_file.name

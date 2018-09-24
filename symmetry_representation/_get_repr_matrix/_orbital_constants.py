@@ -8,7 +8,6 @@ from ._orbitals import Spin
 
 __all__ = ['WANNIER_ORBITALS', 'SPIN_UP', 'SPIN_DOWN', 'NO_SPIN']
 
-# TODO: CHECK
 WANNIER_ORBITALS = {
     's': ['1'],
     'p': ['z', 'x', 'y'],

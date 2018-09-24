@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+"""
+Configuration file for pytest tests.
+"""
 
 import os
 import json
@@ -11,6 +14,10 @@ import symmetry_representation as sr
 
 @pytest.fixture
 def sample():
+    """
+    Returns the path to the sample of the given name.
+    """
+
     def inner(name):
         return os.path.join(
             os.path.join(
@@ -24,11 +31,11 @@ def sample():
 @pytest.fixture
 def test_name(request):
     """Returns module_name.function_name for a given test"""
-    return request.module.__name__ + '/' + request._parent_request._pyfuncitem.name
+    return request.module.__name__ + '/' + request._parent_request._pyfuncitem.name  # pylint: disable=protected-access
 
 
 @pytest.fixture
-def compare_data(request, test_name, scope="session"):
+def compare_data(request, test_name, scope="session"):  # pylint: disable=unused-argument,redefined-outer-name
     """Returns a function which either saves some data to a file or (if that file exists already) compares it to pre-existing data using a given comparison function."""
 
     def inner(compare_fct, data, tag=None):
@@ -50,25 +57,25 @@ def compare_data(request, test_name, scope="session"):
 
 
 @pytest.fixture
-def compare_equal(compare_data):
+def compare_equal(compare_data):  # pylint: disable=redefined-outer-name
     return lambda data, tag=None: compare_data(lambda x, y: x == y, data, tag)
 
 
 @pytest.fixture
-def symmetries_file(sample):
+def symmetries_file(sample):  # pylint: disable=redefined-outer-name
     return sample('symmetries.hdf5')
 
 
 @pytest.fixture
-def symmetries_file_content(symmetries_file):
+def symmetries_file_content(symmetries_file):  # pylint: disable=redefined-outer-name
     return sr.io.load(symmetries_file)
 
 
 @pytest.fixture
-def unstrained_poscar(sample):
+def unstrained_poscar(sample):  # pylint: disable=redefined-outer-name
     return sample('POSCAR')
 
 
 @pytest.fixture
-def strained_poscar(sample):
+def strained_poscar(sample):  # pylint: disable=redefined-outer-name
     return sample('POSCAR_110_bi_0.04')

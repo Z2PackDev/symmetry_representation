@@ -34,7 +34,7 @@ def _expr_to_vector(
     # create random values for the coordinates and evaluate
     # both the basis functions and the expression to generate
     # the linear equation to be solved
-    A = []
+    A = []  # pylint: disable=invalid-name
     b = []  # pylint: disable=invalid-name
     for _ in range(2 * dim):
         if not numeric:

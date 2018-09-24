@@ -11,15 +11,15 @@ import sys
 if sys.version_info < (3, 4):
     raise 'must use Python version 3.4 or higher'
 
-readme = """A tool to describe symmetry operations and their representation."""
+README = """A tool to describe symmetry operations and their representation."""
 
-with open('./symmetry_representation/_version.py', 'r') as f:
-    match_expr = "__version__[^'" + '"]+([' + "'" + r'"])([^\1]+)\1'
-    version = re.search(match_expr, f.read()).group(2)
+with open('./symmetry_representation/__init__.py', 'r') as f:
+    MATCH_EXPR = "__version__[^'\"]+(['\"])([^'\"]+)"
+    VERSION = re.search(MATCH_EXPR, f.read()).group(2).strip()
 
 setup(
     name='symmetry-representation',
-    version=version,
+    version=VERSION,
     url='http://z2pack.ethz.ch/symmetry-representation',
     author='Dominik Gresch',
     author_email='greschd@gmx.ch',
@@ -34,7 +34,7 @@ setup(
             'sphinx-rtd-theme', 'sphinx-click', 'prospector', 'pylint'
         ]
     },
-    long_description=readme,
+    long_description=README,
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Natural Language :: English', 'Operating System :: Unix',
@@ -47,7 +47,9 @@ setup(
         'Development Status :: 4 - Beta'
     ],
     license='GPL',
-    packages=['symmetry_representation'],
+    packages=[
+        'symmetry_representation', 'symmetry_representation._get_repr_matrix'
+    ],
     entry_points='''
         [console_scripts]
         symmetry-repr=symmetry_representation._cli:cli

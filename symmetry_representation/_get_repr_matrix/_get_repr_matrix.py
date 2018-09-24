@@ -1,3 +1,7 @@
+"""
+Defines the functionality for automatically creating representation matrices.
+"""
+
 from fractions import Fraction
 
 import numpy as np
@@ -75,10 +79,30 @@ def get_repr_matrix(
     )
 
 
-def _get_repr_matrix_impl(
+def _get_repr_matrix_impl(  # pylint: disable=too-many-locals
     *, orbitals, real_space_operator, rotation_matrix_cartesian,
     spin_rot_function, numeric
 ):
+    """
+    Implements the functionality for getting the representation matrix. The
+    function to get the spin rotation matrix can be defined, to allow use in the
+    time-reversal case.
+
+    Arguments
+    ---------
+    orbitals : List(Orbital)
+        Basis orbitals with respect to which the representation should be created.
+    real_space_operator : .RealSpaceOperator
+        Real-space operator of the symmetry operation.
+    rotation_matrix_cartesian : np.array or sp.Matrix
+        Rotation matrix of the symmetry operation in cartesian coordinates.
+    spin_rot_function : Callable
+        A function which applies the spin rotation, given the initial spin and
+        cartesian rotation matrix.
+    numeric : bool
+        Flag to determine whether numeric (numpy) or symbolic (sympy) computation
+        should be used.
+    """
 
     orbitals = list(orbitals)
 
@@ -139,6 +163,10 @@ def _get_repr_matrix_impl(
 
 
 def _get_positions_mapping(orbitals, real_space_operator):
+    """
+    Calculates the mapping from initial to final positions, given the orbital
+    basis and real space operator.
+    """
     positions = [orbital.position for orbital in orbitals]
     res = {}
     for i, pos1 in enumerate(positions):
@@ -151,16 +179,28 @@ def _get_positions_mapping(orbitals, real_space_operator):
 
 
 def _is_same_position(pos1, pos2):
+    """
+    Checks if two positions are the same, up to a lattice vector.
+    """
     return np.isclose(_pos_distance(pos1, pos2), 0, atol=1e-6)
 
 
 def _pos_distance(pos1, pos2):
+    """
+    Returns the periodic distance between two positions.
+    """
     delta = np.array(pos1) - np.array(pos2)
     delta %= 1
     return la.norm(np.array(np.minimum(delta, 1 - delta)).astype(float))
 
 
-def _apply_spin_time_reversal(*, spin, **kwargs):
+def _apply_spin_time_reversal(rotation_matrix_cartesian, spin):
+    """
+    Applies the effect of time-reversal on a spin.
+    """
+    dim = rotation_matrix_cartesian.shape[0]
+    assert np.all(rotation_matrix_cartesian == np.eye(dim)
+                  ) or rotation_matrix_cartesian == sp.eye(dim)
     if spin.total == 0:
         return {spin: 1}
 
@@ -176,6 +216,9 @@ def _apply_spin_time_reversal(*, spin, **kwargs):
 
 
 def _apply_spin_rotation(rotation_matrix_cartesian, spin):
+    """
+    Applies the effect of a given rotation on spin.
+    """
     if spin.total == 0:
         return {spin: 1}
     elif spin.total == Fraction(1, 2):
@@ -187,6 +230,9 @@ def _apply_spin_rotation(rotation_matrix_cartesian, spin):
 
 
 def _spin_to_vector(spin):
+    """
+    Helper function to convert a spin to vector representation.
+    """
     size = int(2 * spin.total + 1)
     idx = int(spin.total - spin.z_component)
     res = np.zeros(size)
@@ -195,6 +241,10 @@ def _spin_to_vector(spin):
 
 
 def _vec_to_spins(vec):
+    """
+    Helper function to convert a vector back to spins. The result is a dictionary,
+    where the key is the spin, and the value is its vector component.
+    """
     total = Fraction(vec.size - 1, 2)
     res = {}
     for i, val in enumerate(vec):

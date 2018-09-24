@@ -33,7 +33,8 @@ import symmetry_representation
 # ones.
 extensions = [
     'sphinx.ext.todo', 'sphinx.ext.autodoc', 'sphinx.ext.mathjax',
-    'sphinx.ext.viewcode', 'sphinx.ext.intersphinx', 'sphinx_click.ext'
+    'sphinx.ext.viewcode', 'sphinx.ext.intersphinx', 'sphinx_click.ext',
+    'sphinx.ext.napoleon'
 ]
 
 intersphinx_mapping = {
