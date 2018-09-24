@@ -3,6 +3,7 @@ Test that the automatically generated symmetry representations match a reference
 """
 
 import numpy as np
+from numpy.testing import assert_allclose
 import pymatgen as mg
 import pymatgen.symmetry.analyzer  # pylint: disable=unused-import
 import symmetry_representation as sr
@@ -53,12 +54,14 @@ def test_auto_repr(sample):
     assert symmetry_group.full_group == reference.full_group
     for sym1, sym2 in zip(symmetry_group.symmetries, reference.symmetries):
         assert sym1.repr.has_cc == sym2.repr.has_cc
-        assert np.allclose(sym1.repr.matrix, sym2.repr.matrix)
-        assert np.allclose(
+        assert_allclose(sym1.repr.matrix, sym2.repr.matrix, atol=1e-12)
+        assert_allclose(
             sym1.real_space_operator.rotation_matrix,
-            sym2.real_space_operator.rotation_matrix
+            sym2.real_space_operator.rotation_matrix,
+            atol=1e-12
         )
-        assert np.allclose(
+        assert_allclose(
             sym1.real_space_operator.translation_vector,
-            sym2.real_space_operator.translation_vector
+            sym2.real_space_operator.translation_vector,
+            atol=1e-12
         )
