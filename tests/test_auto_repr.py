@@ -44,8 +44,6 @@ def test_auto_repr(sample):
     reference = sr.io.load(sample('symmetries_InAs.hdf5'))
     assert symmetry_group.full_group == reference.full_group
     for sym1, sym2 in zip(symmetry_group.symmetries, reference.symmetries):
-        assert sym1.repr.has_cc == sym2.repr.has_cc
-        assert_allclose(sym1.repr.matrix, sym2.repr.matrix, atol=1e-12)
         assert_allclose(
             sym1.real_space_operator.rotation_matrix,
             sym2.real_space_operator.rotation_matrix,
@@ -56,3 +54,5 @@ def test_auto_repr(sample):
             sym2.real_space_operator.translation_vector,
             atol=1e-12
         )
+        assert sym1.repr.has_cc == sym2.repr.has_cc
+        assert_allclose(sym1.repr.matrix, sym2.repr.matrix, atol=1e-12)
