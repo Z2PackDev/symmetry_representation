@@ -26,7 +26,7 @@ setup(
     description='Provides an interface to describe symmetry representations.',
     install_requires=[
         'numpy', 'sympy', 'fsc.export', 'fsc.hdf5-io>=0.3', 'h5py', 'pymatgen',
-        'click'
+        'click>=7.0'
     ],
     extras_require={
         'dev': [

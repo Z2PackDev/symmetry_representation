@@ -19,7 +19,7 @@ def test_filter_symmetries_noop(unstrained_poscar, symmetries_file):
     with tempfile.NamedTemporaryFile() as out_file:
         runner.invoke(
             cli, [
-                'filter_symmetries', '-s', symmetries_file, '-l',
+                'filter-symmetries', '-s', symmetries_file, '-l',
                 unstrained_poscar, '-o', out_file.name
             ],
             catch_exceptions=False
@@ -38,7 +38,7 @@ def test_filter_symmetries_strained(strained_poscar, symmetries_file):
     with tempfile.NamedTemporaryFile() as out_file:
         runner.invoke(
             cli, [
-                'filter_symmetries', '-s', symmetries_file, '-l',
+                'filter-symmetries', '-s', symmetries_file, '-l',
                 strained_poscar, '-o', out_file.name
             ],
             catch_exceptions=False
