@@ -43,6 +43,7 @@ def get_time_reversal(*, orbitals, numeric):
         rotation_matrix_cartesian=unity,
         spin_rot_function=_apply_spin_time_reversal,
         numeric=numeric,
+        position_tolerance=1e-4
     )
     return SymmetryOperation.from_real_space_operator(
         real_space_operator=real_space_operator,
@@ -53,7 +54,12 @@ def get_time_reversal(*, orbitals, numeric):
 
 @export
 def get_repr_matrix(
-    *, orbitals, real_space_operator, rotation_matrix_cartesian, numeric
+    *,
+    orbitals,
+    real_space_operator,
+    rotation_matrix_cartesian,
+    numeric,
+    position_tolerance=1e-4
 ):
     """
     Create the representation matrix for a unitary operator.
@@ -69,19 +75,24 @@ def get_repr_matrix(
     numeric : bool
         Flag to determine whether numeric (numpy) or symbolic (sympy) computation
         should be used.
+    position_tolerance : float
+        Absolute distance between positions (in reciprocal units) for which they
+        are still considered to be the same position.
     """
     return _get_repr_matrix_impl(
         orbitals=orbitals,
         real_space_operator=real_space_operator,
         rotation_matrix_cartesian=rotation_matrix_cartesian,
         spin_rot_function=_apply_spin_rotation,
-        numeric=numeric
+        numeric=numeric,
+        position_tolerance=position_tolerance
     )
 
 
 def _get_repr_matrix_impl(  # pylint: disable=too-many-locals
     *, orbitals, real_space_operator, rotation_matrix_cartesian,
-    spin_rot_function, numeric
+    spin_rot_function, numeric,
+    position_tolerance
 ):
     """
     Implements the functionality for getting the representation matrix. The
@@ -102,12 +113,17 @@ def _get_repr_matrix_impl(  # pylint: disable=too-many-locals
     numeric : bool
         Flag to determine whether numeric (numpy) or symbolic (sympy) computation
         should be used.
+    position_tolerance : float
+        Absolute distance between positions (in reciprocal units) for which they
+        are still considered to be the same position.
     """
 
     orbitals = list(orbitals)
 
     positions_mapping = _get_positions_mapping(
-        orbitals=orbitals, real_space_operator=real_space_operator
+        orbitals=orbitals,
+        real_space_operator=real_space_operator,
+        position_tolerance=position_tolerance
     )
     repr_matrix = sp.zeros(len(orbitals))
 
@@ -162,7 +178,7 @@ def _get_repr_matrix_impl(  # pylint: disable=too-many-locals
         return repr_matrix
 
 
-def _get_positions_mapping(orbitals, real_space_operator):
+def _get_positions_mapping(orbitals, real_space_operator, position_tolerance):
     """
     Calculates the mapping from initial to final positions, given the orbital
     basis and real space operator.
@@ -172,17 +188,18 @@ def _get_positions_mapping(orbitals, real_space_operator):
     for i, pos1 in enumerate(positions):
         new_pos = real_space_operator.apply(pos1)
         res[i] = [
-            j for j, pos2 in enumerate(positions)
-            if _is_same_position(new_pos, pos2)
+            j for j, pos2 in enumerate(positions) if _is_same_position(
+                new_pos, pos2, position_tolerance=position_tolerance
+            )
         ]
     return res
 
 
-def _is_same_position(pos1, pos2):
+def _is_same_position(pos1, pos2, position_tolerance):
     """
     Checks if two positions are the same, up to a lattice vector.
     """
-    return np.isclose(_pos_distance(pos1, pos2), 0, atol=1e-6)
+    return np.isclose(_pos_distance(pos1, pos2), 0, atol=position_tolerance)
 
 
 def _pos_distance(pos1, pos2):
