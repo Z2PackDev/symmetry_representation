@@ -1,3 +1,6 @@
+.. © 2017-2018, ETH Zurich, Institut für Theoretische Physik
+.. Author: Dominik Gresch <greschd@gmx.ch>
+
 .. _home:
 
 symmetry-representation
@@ -21,5 +24,6 @@ You can install this tool with with pip:
 .. toctree::
     :hidden:
 
-    Usage <self>
+    Overview <self>
+    tutorial.rst
     reference.rst

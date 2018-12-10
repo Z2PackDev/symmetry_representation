@@ -1,3 +1,5 @@
+# © 2017-2018, ETH Zurich, Institut für Theoretische Physik
+# Author: Dominik Gresch <greschd@gmx.ch>
 """
 Defines orbitals and their spin, which are used as basis for constructing
 representation matrices.

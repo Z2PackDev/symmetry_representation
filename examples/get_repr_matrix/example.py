@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# © 2017-2018, ETH Zurich, Institut für Theoretische Physik
+# Author: Dominik Gresch <greschd@gmx.ch>
+
 import numpy as np
 import pymatgen as mg
 import pymatgen.symmetry.analyzer

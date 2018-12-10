@@ -1,3 +1,5 @@
+# © 2017-2018, ETH Zurich, Institut für Theoretische Physik
+# Author: Dominik Gresch <greschd@gmx.ch>
 """
 Utilities for handling algebraic expressions, such as turning them to vector or matrix form.
 """

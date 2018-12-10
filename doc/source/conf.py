@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-#
+
+# © 2017-2018, ETH Zurich, Institut für Theoretische Physik
+# Author: Dominik Gresch <greschd@gmx.ch>
+
 # documentation build configuration file, created by
 # sphinx-quickstart on Fri Oct 10 02:14:52 2014.
 #
@@ -12,8 +15,6 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import os
-import sys
 import time
 
 import sphinx_rtd_theme
@@ -64,9 +65,9 @@ master_doc = 'index'
 # General information about the project.
 project = u'symmetry-representation'
 if time.localtime().tm_year == 2017:
-    copyright = u'2017, Dominik Gresch'
+    copyright = u'2017, ETH Zurich'
 else:
-    copyright = u'2017-{}, Dominik Gresch'.format(time.localtime().tm_year)
+    copyright = u'2017-{}, ETH Zurich'.format(time.localtime().tm_year)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
