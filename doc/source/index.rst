@@ -3,26 +3,49 @@
 
 .. _home:
 
+.. title:: Overview
+
 symmetry-representation
 =======================
 
-This is a tool to describe symmetry operations and their representations. The tool is currently in development, meaning that some essential features are still missing. This documentation will continue to be updated as more features become available.
-
-.. contents ::
-    :local:
+The purpose of the symmetry-representation library is to describe symmetry operations in crystalline solids, and their representations. It contains functionality to automatically construct the representation matrices for specific orbitals.
 
 
-Installation
-~~~~~~~~~~~~
+.. rubric:: Parts of the documentation
 
-You can install this tool with with pip:
+| :ref:`tutorial`
+| start here
+|
+| :ref:`reference`
+| detailed description of the classes and functions
+|
+
+.. rubric:: Installation
+
+You can install symmetry-representation with pip:
 
 .. code ::
 
     pip install symmetry-representation
 
+.. rubric:: Indices and tables
+
+| :ref:`genindex`
+| list of all functions and classes
+|
+| :ref:`modindex`
+| list of all modules and submodules
+
+
+.. rubric:: Getting in touch
+
+The development version of symmetry-representation is hosted on `GitHub <https://github.com/Z2PackDev/symmetry_representation>`_ .
+Post an issue there or contact `me <http://github.com/greschd>`_ directly with questions / suggestions
+/ feedback.
+
 .. toctree::
     :hidden:
+    :maxdepth: 2
 
     Overview <self>
     tutorial.rst

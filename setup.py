@@ -34,7 +34,7 @@ setup(
     extras_require={
         'dev': [
             'pytest', 'pytest-cov', 'yapf==0.24', 'pre-commit==1.11.1',
-            'sphinx', 'sphinx-rtd-theme', 'sphinx-click',
+            'sphinx', 'sphinx-rtd-theme', 'sphinx-click', 'ipython>=6.2',
             'prospector==1.1.6.*', 'pylint==2.1.*'
         ]
     },
