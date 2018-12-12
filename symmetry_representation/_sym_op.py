@@ -114,6 +114,8 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
             representation matrix is constructed.
         """
         from . import _get_repr_matrix
+        if kwargs.get('repr_has_cc', False):
+            raise NotImplementedError
         repr_matrix = _get_repr_matrix.get_repr_matrix(
             orbitals=orbitals,
             real_space_operator=real_space_operator,
