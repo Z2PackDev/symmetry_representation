@@ -11,15 +11,24 @@ import tempfile
 
 import pytest
 import numpy as np
+import sympy as sp
 
 import symmetry_representation as sr
 
 SYM_OP = sr.SymmetryOperation(
-    rotation_matrix=np.array([[1, 2, 3], [4, 5j, 9]]),
+    rotation_matrix=np.array([[1, 2, 3], [4, 5, 9]]),
     repr_matrix=np.array([[0, 1], [3, 5]]),
     repr_has_cc=True
 )
+SYM_OP_ANALYTIC = sr.SymmetryOperation(
+    rotation_matrix=np.array([[1, 2, 3], [4, 5, 9]]),
+    repr_matrix=sp.Matrix([[0, 1], [3, 5]]),
+    repr_has_cc=True
+)
 REPR_MATRIX = sr.Representation(matrix=np.array([[1j, 0], [-2j, 3j]]))
+REPR_MATRIX_ANALYTIC = sr.Representation(
+    matrix=sp.Matrix([[sp.I, 0], [-2 * sp.I, 3 * sp.I]])
+)
 SYM_GROUP = sr.SymmetryGroup(symmetries=[SYM_OP, SYM_OP], full_group=True)
 
 
@@ -27,7 +36,9 @@ SYM_GROUP = sr.SymmetryGroup(symmetries=[SYM_OP, SYM_OP], full_group=True)
     'data', [
         SYM_OP, [SYM_OP], REPR_MATRIX, [REPR_MATRIX],
         [SYM_OP, [SYM_OP], REPR_MATRIX], SYM_GROUP,
-        [SYM_GROUP, SYM_OP, REPR_MATRIX]
+        [SYM_GROUP, SYM_OP, REPR_MATRIX], REPR_MATRIX_ANALYTIC,
+        [REPR_MATRIX_ANALYTIC], [SYM_GROUP, SYM_OP, REPR_MATRIX_ANALYTIC],
+        SYM_OP_ANALYTIC
     ]
 )
 def test_save_load(data):
