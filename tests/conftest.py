@@ -82,3 +82,8 @@ def unstrained_poscar(sample):  # pylint: disable=redefined-outer-name
 @pytest.fixture
 def strained_poscar(sample):  # pylint: disable=redefined-outer-name
     return sample('POSCAR_110_bi_0.04')
+
+
+@pytest.fixture(params=[True, False])
+def numeric(request):
+    return request.param

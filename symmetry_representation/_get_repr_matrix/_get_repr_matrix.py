@@ -34,10 +34,7 @@ def get_time_reversal(*, orbitals, numeric):
         should be used.
     """
     dim = len(orbitals[0].position)
-    if numeric:
-        unity = np.eye(dim)
-    else:
-        unity = sp.eye(dim)
+    unity = np.eye(dim)
     real_space_operator = RealSpaceOperator(rotation_matrix=unity)
     repr_matrix = _get_repr_matrix_impl(
         orbitals=orbitals,
@@ -64,7 +61,9 @@ def get_repr_matrix(
     position_tolerance=1e-4
 ):
     """
-    Create the representation matrix for a unitary operator.
+    Create the representation matrix for a unitary operator. If analytic values
+    are used (``numeric=False``), the ``rotation_matrix_cartesian`` must be an
+    exact value.
 
     Arguments
     ---------
@@ -128,12 +127,16 @@ def _get_repr_matrix_impl(  # pylint: disable=too-many-locals
         position_tolerance=position_tolerance
     )
     repr_matrix = sp.zeros(len(orbitals))
+    if not numeric:
+        rotation_matrix_cartesian = sp.Matrix(rotation_matrix_cartesian)
 
     expr_substitution = _get_substitution(rotation_matrix_cartesian)
     for i, orb in enumerate(orbitals):
         res_pos_idx = positions_mapping[i]
         spin_res = spin_rot_function(
-            rotation_matrix_cartesian=rotation_matrix_cartesian, spin=orb.spin
+            rotation_matrix_cartesian=rotation_matrix_cartesian,
+            spin=orb.spin,
+            numeric=numeric
         )
 
         new_func = orb.function.subs(expr_substitution, simultaneous=True)
@@ -213,48 +216,60 @@ def _pos_distance(pos1, pos2):
     return la.norm(np.array(np.minimum(delta, 1 - delta)).astype(float))
 
 
-def _apply_spin_time_reversal(rotation_matrix_cartesian, spin):
+def _apply_spin_time_reversal(rotation_matrix_cartesian, spin, numeric):
     """
     Applies the effect of time-reversal on a spin.
     """
     dim = rotation_matrix_cartesian.shape[0]
-    assert np.all(rotation_matrix_cartesian == np.eye(dim)
-                  ) or rotation_matrix_cartesian == sp.eye(dim)
+    if numeric:
+        assert np.all(rotation_matrix_cartesian == np.eye(dim))
+    else:
+        assert rotation_matrix_cartesian == sp.eye(dim)
     if spin.total == 0:
         return {spin: 1}
 
     # time-reversal is represented by sigma_y * complex conjugation
     elif spin.total == Fraction(1, 2):
         if spin == SPIN_UP:
-            return {SPIN_DOWN: 1j}
+            if numeric:
+                return {SPIN_DOWN: 1j}
+            else:
+                return {SPIN_DOWN: sp.I}
         else:
             assert spin == SPIN_DOWN
-            return {SPIN_UP: -1j}
+            if numeric:
+                return {SPIN_UP: -1j}
+            else:
+                return {SPIN_UP: -sp.I}
     else:
         raise NotImplementedError('Spins larger than 1/2 are not implemented.')
 
 
-def _apply_spin_rotation(rotation_matrix_cartesian, spin):
+def _apply_spin_rotation(rotation_matrix_cartesian, spin, numeric):
     """
     Applies the effect of a given rotation on spin.
     """
     if spin.total == 0:
         return {spin: 1}
     elif spin.total == Fraction(1, 2):
-        spin_vec = _spin_to_vector(spin)
-        spin_vec_res = _spin_reps(rotation_matrix_cartesian).dot(spin_vec)
+        spin_vec = _spin_to_vector(spin, numeric)
+        spin_vec_res = _spin_reps(rotation_matrix_cartesian,
+                                  numeric) @ (spin_vec)
         return _vec_to_spins(spin_vec_res)
     else:
         raise NotImplementedError('Spins larger than 1/2 are not implemented.')
 
 
-def _spin_to_vector(spin):
+def _spin_to_vector(spin, numeric):
     """
     Helper function to convert a spin to vector representation.
     """
     size = int(2 * spin.total + 1)
     idx = int(spin.total - spin.z_component)
-    res = np.zeros(size)
+    if numeric:
+        res = np.zeros(size)
+    else:
+        res = sp.zeros(size, 1)
     res[idx] = 1
     return res
 
@@ -264,7 +279,7 @@ def _vec_to_spins(vec):
     Helper function to convert a vector back to spins. The result is a dictionary,
     where the key is the spin, and the value is its vector component.
     """
-    total = Fraction(vec.size - 1, 2)
+    total = Fraction(vec.shape[0] - 1, 2)
     res = {}
     for i, val in enumerate(vec):
         if val != 0:

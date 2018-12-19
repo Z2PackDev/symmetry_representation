@@ -10,6 +10,7 @@ Defines symmetry operations and groups.
 import types
 
 import numpy as np
+import sympy as sp
 from fsc.export import export
 from fsc.hdf5_io import subscribe_hdf5, SimpleHDF5Mapping
 
@@ -57,6 +58,10 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
         Real-space displacement vector of the symmetry (in reduced coordinates).
     repr_has_cc : bool
         Specifies whether the representation contains a complex conjugation.
+    numeric : bool
+        Specifies whether the symmetry operation contains a numeric or analytic
+        representation matrix. By default, this is determined by the type of the
+        passed matrix.
 
     Attributes
     ----------
@@ -74,13 +79,17 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
         rotation_matrix,
         repr_matrix,
         translation_vector=None,
-        repr_has_cc=False
+        repr_has_cc=False,
+        numeric=None
     ):
+
         self.real_space_operator = RealSpaceOperator(
             rotation_matrix=rotation_matrix,
-            translation_vector=translation_vector
+            translation_vector=translation_vector,
         )
-        self.repr = Representation(matrix=repr_matrix, has_cc=repr_has_cc)
+        self.repr = Representation(
+            matrix=repr_matrix, has_cc=repr_has_cc, numeric=numeric
+        )
 
     @classmethod
     def from_real_space_operator(cls, *, real_space_operator, **kwargs):
@@ -125,6 +134,7 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
         return cls.from_real_space_operator(
             real_space_operator=real_space_operator,
             repr_matrix=repr_matrix,
+            numeric=numeric,
             **kwargs
         )
 
@@ -215,9 +225,13 @@ class RealSpaceOperator(SimpleHDF5Mapping, types.SimpleNamespace):
     HDF5_ATTRIBUTES = ['rotation_matrix', 'translation_vector']
 
     def __init__(self, rotation_matrix, translation_vector=None):
+        rotation_matrix = np.array(rotation_matrix).astype(float)
         self.rotation_matrix = rotation_matrix
+
         if translation_vector is None:
             translation_vector = np.zeros(len(self.rotation_matrix))
+        else:
+            translation_vector = np.array(translation_vector).astype(float)
         self.translation_vector = translation_vector
 
     @classmethod
@@ -292,17 +306,29 @@ class Representation(SimpleHDF5Mapping, types.SimpleNamespace):
     has_cc : bool
         Determines whether the representation contains complex conjugation
         (that is, whether it is anti-unitary).
+    numeric : bool
+        Determines if the representation matrix is numeric or analytic. By default
+        this is determined from the type of the passed matrix.
     """
-    HDF5_ATTRIBUTES = ['matrix', 'has_cc']
+    HDF5_ATTRIBUTES = ['matrix', 'has_cc', 'numeric']
 
-    def __init__(self, matrix, has_cc=False):
+    def __init__(self, matrix, has_cc=False, numeric=None):
+        if numeric is None:
+            numeric = not isinstance(matrix, sp.Matrix)
+        if numeric:
+            matrix = np.array(matrix).astype(complex)
         self.matrix = matrix
         self.has_cc = has_cc
+        self.numeric = numeric
 
     def __matmul__(self, other):
         """
         Defines the product of representations.
         """
+        if self.numeric != other.numeric:
+            raise ValueError(
+                'Cannot multiply numeric and analytic representations.'
+            )
         if not isinstance(other, Representation):
             raise TypeError(
                 'Cannot matrix-multiply objects of type {} and {}'.format(
@@ -327,4 +353,11 @@ class Representation(SimpleHDF5Mapping, types.SimpleNamespace):
         return (not self.has_cc) and np.allclose(self.matrix, np.eye(n))
 
     def __eq__(self, val):
-        return np.all(self.matrix == val.matrix) and self.has_cc == val.has_cc
+        if self.numeric != val.numeric:
+            return False
+        if self.has_cc != val.has_cc:
+            return False
+        if self.numeric:
+            return np.all(self.matrix == val.matrix)
+        else:
+            return self.matrix == val.matrix

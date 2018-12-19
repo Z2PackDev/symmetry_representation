@@ -4,9 +4,16 @@
 Test that the automatically generated symmetry representations match a reference.
 """
 
+import pytest
+
+import numpy as np
 from numpy.testing import assert_allclose
+
+import sympy as sp
+
 import pymatgen as mg
 import pymatgen.symmetry.analyzer  # pylint: disable=unused-import
+
 import symmetry_representation as sr
 
 
@@ -58,3 +65,51 @@ def test_auto_repr(sample):
         )
         assert sym1.repr.has_cc == sym2.repr.has_cc
         assert_allclose(sym1.repr.matrix, sym2.repr.matrix, atol=1e-12)
+
+
+@pytest.mark.parametrize(
+    ('orbitals', 'result_repr_matrix'),
+    [
+        ([
+            sr.
+            Orbital(position=(0.1, 0.2, 0.3), function_string='1', spin=None)
+        ], sp.Matrix([[1]])),
+        ([
+            sr.Orbital(
+                position=(0.4, 0.2, 0.8), function_string='1', spin=sr.SPIN_UP
+            ),
+            sr.Orbital(
+                position=(0.4, 0.2, 0.8),
+                function_string='1',
+                spin=sr.SPIN_DOWN
+            )
+        ], sp.Matrix([[0, -sp.I], [sp.I, 0]])),
+        ([
+            sr.
+            Orbital(position=(0.1, 0.2, 0.3), function_string='x', spin=None)
+        ], sp.Matrix([[1]])),
+    ],
+)
+def test_time_reversal(orbitals, result_repr_matrix, numeric):
+    """
+    Test the generation of a representation matrix for time-reversal.
+    """
+    result = sr.get_time_reversal(orbitals=orbitals, numeric=numeric)
+    if numeric:
+        assert isinstance(result.repr.matrix, np.ndarray)
+        assert np.allclose(
+            result.repr.matrix,
+            np.array(result_repr_matrix).astype(complex)
+        )
+    else:
+        assert isinstance(result.repr.matrix, sp.Matrix)
+        assert result.repr.matrix == result_repr_matrix
+    assert result.repr.has_cc
+    assert isinstance(result.real_space_operator.rotation_matrix, np.ndarray)
+    assert np.allclose(result.real_space_operator.rotation_matrix, np.eye(3))
+    assert isinstance(
+        result.real_space_operator.translation_vector, np.ndarray
+    )
+    assert np.allclose(
+        result.real_space_operator.translation_vector, np.zeros(3)
+    )
