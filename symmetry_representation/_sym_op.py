@@ -310,7 +310,8 @@ class Representation(SimpleHDF5Mapping, types.SimpleNamespace):
         Determines if the representation matrix is numeric or analytic. By default
         this is determined from the type of the passed matrix.
     """
-    HDF5_ATTRIBUTES = ['matrix', 'has_cc', 'numeric']
+    HDF5_ATTRIBUTES = ['matrix', 'has_cc']
+    HDF5_OPTIONAL = ['numeric']
 
     def __init__(self, matrix, has_cc=False, numeric=None):
         if numeric is None:
