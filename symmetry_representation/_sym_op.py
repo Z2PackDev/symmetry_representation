@@ -318,6 +318,8 @@ class Representation(SimpleHDF5Mapping, types.SimpleNamespace):
             numeric = not isinstance(matrix, sp.Matrix)
         if numeric:
             matrix = np.array(matrix).astype(complex)
+        else:
+            matrix = sp.Matrix(matrix)
         self.matrix = matrix
         self.has_cc = has_cc
         self.numeric = numeric
