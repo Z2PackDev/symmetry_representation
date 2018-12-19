@@ -113,3 +113,68 @@ def test_time_reversal(orbitals, result_repr_matrix, numeric):
     assert np.allclose(
         result.real_space_operator.translation_vector, np.zeros(3)
     )
+
+
+@pytest.mark.parametrize(['orbitals', 'rotation_matrix', 'reference'], [
+    ([sr.Orbital(position=(0, 0, 0), function_string='1', spin=None)],
+     np.array([[0, 1, 0], [1, 0, 0], [0, 0, 1]]), sp.eye(1, 1)),
+    ([
+        sr.Orbital(position=(0, 0, 0), function_string='x', spin=None),
+        sr.Orbital(position=(0, 0, 0), function_string='y', spin=None)
+    ], np.array([[0, 1, 0], [1, 0, 0], [0, 0, 1]]), sp.Matrix([[0, 1], [1, 0]]
+                                                              )),
+    ([
+        sr.Orbital(position=(0, 0, 0), function_string='1', spin=sr.SPIN_UP),
+        sr.Orbital(position=(0, 0, 0), function_string='1', spin=sr.SPIN_DOWN)
+    ], np.array([[0, 1, 0], [1, 0, 0], [0, 0, 1]]),
+     (sp.sqrt(2) / 2) * sp.Matrix([[0, -1 + sp.I], [1 + sp.I, 0]])),
+    ([
+        sr.Orbital(position=(0, 0, 0), function_string='1', spin=sr.SPIN_UP),
+        sr.Orbital(position=(0, 0, 0), function_string='1', spin=sr.SPIN_DOWN)
+    ], np.array([[0, -1, 0], [1, 0, 0], [0, 0, 1]]),
+     (sp.sqrt(2) / 2) * sp.Matrix([[1 - sp.I, 0], [0, 1 + sp.I]])),
+    ([
+        sr.Orbital(
+            position=(0.1, 0.2, 0.3), function_string='x', spin=sr.SPIN_UP
+        ),
+        sr.Orbital(
+            position=(0.4, 0.9, 0.1), function_string='y', spin=sr.SPIN_DOWN
+        )
+    ], np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]]), sp.eye(2, 2)),
+    ([
+        sr.Orbital(position=(0, 0, 0), function_string='1', spin=sr.SPIN_UP),
+        sr.Orbital(position=(0, 0, 0), function_string='1', spin=sr.SPIN_DOWN)
+    ], np.array([[-1, 0, 0], [0, -1, 0], [0, 0, -1]]), sp.eye(2, 2)),
+    ([
+        sr.Orbital(position=(0, 0, 0), function_string='1', spin=sr.SPIN_UP),
+        sr.Orbital(position=(0, 0, 0), function_string='1', spin=sr.SPIN_DOWN)
+    ], np.array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]]),
+     sp.Matrix([[-sp.I, 0], [0, sp.I]])),
+    ([
+        sr.Orbital(position=(0, 0, 0), function_string='1', spin=sr.SPIN_UP),
+        sr.Orbital(position=(0, 0, 0), function_string='1', spin=sr.SPIN_DOWN)
+    ],
+     np.array([[0.5, np.sin(2 * np.pi / 3), 0],
+               [-np.sin(2 * np.pi / 3), 0.5, 0], [0, 0, -1]]),
+     sp.Matrix([[-sp.Rational(1, 2) + sp.sqrt(3) * sp.I / 2, 0],
+                [0, -sp.Rational(1, 2) - sp.sqrt(3) * sp.I / 2]])),
+])
+def test_simple_repr(orbitals, rotation_matrix, reference, numeric):
+    """
+    Test some representation matrices for simple rotations / rotoreflections,
+    where the cartesian and fractional coordinates are the same.
+    """
+    result = sr.get_repr_matrix(
+        orbitals=orbitals,
+        real_space_operator=sr.RealSpaceOperator(
+            rotation_matrix=rotation_matrix
+        ),
+        rotation_matrix_cartesian=rotation_matrix,
+        numeric=numeric
+    )
+    if numeric:
+        assert isinstance(result, np.ndarray)
+        assert np.allclose(result, np.array(reference).astype(complex))
+    else:
+        assert isinstance(result, sp.Matrix)
+        assert result.equals(reference)

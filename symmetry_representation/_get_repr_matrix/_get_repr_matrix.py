@@ -180,6 +180,7 @@ def _get_repr_matrix_impl(  # pylint: disable=too-many-locals
     if numeric:
         return repr_matrix_numeric
     else:
+        repr_matrix.simplify()
         return repr_matrix
 
 
