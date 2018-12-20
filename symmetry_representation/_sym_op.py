@@ -226,12 +226,19 @@ class RealSpaceOperator(SimpleHDF5Mapping, types.SimpleNamespace):
 
     def __init__(self, rotation_matrix, translation_vector=None):
         rotation_matrix = np.array(rotation_matrix).astype(float)
+        n, m = rotation_matrix.shape
+        if n != m:
+            raise ValueError('The rotation matrix must be square.')
         self.rotation_matrix = rotation_matrix
 
         if translation_vector is None:
             translation_vector = np.zeros(len(self.rotation_matrix))
         else:
             translation_vector = np.array(translation_vector).astype(float)
+        if len(translation_vector) != n:
+            raise ValueError(
+                'The length of the translation vector must match the matrix dimension.'
+            )
         self.translation_vector = translation_vector
 
     @classmethod
@@ -270,8 +277,7 @@ class RealSpaceOperator(SimpleHDF5Mapping, types.SimpleNamespace):
         reflection part.
         """
         n, m = self.rotation_matrix.shape
-        if n != m:
-            return False
+        assert n == m
         return np.allclose(self.rotation_matrix, np.eye(n))
 
     @property
@@ -318,8 +324,18 @@ class Representation(SimpleHDF5Mapping, types.SimpleNamespace):
             numeric = not isinstance(matrix, sp.Matrix)
         if numeric:
             matrix = np.array(matrix).astype(complex)
+            if not np.allclose(
+                matrix @ matrix.T.conjugate(), np.eye(matrix.shape[0])
+            ):
+                raise ValueError(
+                    'Input matrix is not unitary: {}'.format(matrix)
+                )
         else:
             matrix = sp.Matrix(matrix)
+            if not sp.eye(*matrix.shape).equals(matrix @ matrix.H):  # pylint: disable=not-an-iterable
+                raise ValueError(
+                    'Input matrix is not unitary: {}'.format(matrix)
+                )
         self.matrix = matrix
         self.has_cc = has_cc
         self.numeric = numeric
@@ -351,16 +367,20 @@ class Representation(SimpleHDF5Mapping, types.SimpleNamespace):
         Checks if a representation is the identity.
         """
         n, m = self.matrix.shape
-        if n != m:
-            return False
-        return (not self.has_cc) and np.allclose(self.matrix, np.eye(n))
-
-    def __eq__(self, val):
-        if self.numeric != val.numeric:
-            return False
-        if self.has_cc != val.has_cc:
+        assert n == m
+        if self.has_cc:
             return False
         if self.numeric:
-            return np.all(self.matrix == val.matrix)
+            return np.allclose(self.matrix, np.eye(n))
         else:
-            return self.matrix == val.matrix
+            return sp.eye(n, n).equals(self.matrix)
+
+    def __eq__(self, other):
+        if self.numeric != other.numeric:
+            return False
+        if self.has_cc != other.has_cc:
+            return False
+        if self.numeric:
+            return np.all(self.matrix == other.matrix)
+        else:
+            return self.matrix == other.matrix

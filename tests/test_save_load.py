@@ -17,17 +17,17 @@ import symmetry_representation as sr
 
 SYM_OP = sr.SymmetryOperation(
     rotation_matrix=np.array([[1, 2, 3], [4, 5, 9]]),
-    repr_matrix=np.array([[0, 1], [3, 5]]),
+    repr_matrix=np.array([[0, 1], [1, 0]]),
     repr_has_cc=True
 )
 SYM_OP_ANALYTIC = sr.SymmetryOperation(
     rotation_matrix=np.array([[1, 2, 3], [4, 5, 9]]),
-    repr_matrix=sp.Matrix([[0, 1], [3, 5]]),
+    repr_matrix=sp.Matrix([[0, sp.I], [-sp.I, 0]]),
     repr_has_cc=True
 )
-REPR_MATRIX = sr.Representation(matrix=np.array([[1j, 0], [-2j, 3j]]))
+REPR_MATRIX = sr.Representation(matrix=np.array([[1j, 0], [0, -1j]]))
 REPR_MATRIX_ANALYTIC = sr.Representation(
-    matrix=sp.Matrix([[sp.I, 0], [-2 * sp.I, 3 * sp.I]])
+    matrix=sp.Matrix([[sp.I, 0], [0, sp.I]])
 )
 SYM_GROUP = sr.SymmetryGroup(symmetries=[SYM_OP, SYM_OP], full_group=True)
 
