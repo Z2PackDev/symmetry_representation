@@ -52,10 +52,10 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
     ---------
     rotation_matrix : array
         Real-space rotation matrix of the symmetry (in reduced coordinates).
-    repr_matrix : array
-        Matrix of the representation corresponding to the symmetry operation.
     translation_vector : array
         Real-space displacement vector of the symmetry (in reduced coordinates).
+    repr_matrix : array
+        Matrix of the representation corresponding to the symmetry operation.
     repr_has_cc : bool
         Specifies whether the representation contains a complex conjugation.
     numeric : bool
@@ -77,8 +77,8 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
         self,
         *,
         rotation_matrix,
-        repr_matrix,
         translation_vector=None,
+        repr_matrix,
         repr_has_cc=False,
         numeric=None
     ):

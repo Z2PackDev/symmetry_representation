@@ -16,12 +16,12 @@ import sympy as sp
 import symmetry_representation as sr
 
 SYM_OP = sr.SymmetryOperation(
-    rotation_matrix=np.array([[1, 2, 3], [4, 5, 9]]),
+    rotation_matrix=np.array([[1, 2, 3], [4, 5, 9], [10, 11, 12]]),
     repr_matrix=np.array([[0, 1], [1, 0]]),
     repr_has_cc=True
 )
 SYM_OP_ANALYTIC = sr.SymmetryOperation(
-    rotation_matrix=np.array([[1, 2, 3], [4, 5, 9]]),
+    rotation_matrix=np.array([[1, 2, 3], [4, 5, 9], [10, 11, 12]]),
     repr_matrix=sp.Matrix([[0, sp.I], [-sp.I, 0]]),
     repr_has_cc=True
 )
