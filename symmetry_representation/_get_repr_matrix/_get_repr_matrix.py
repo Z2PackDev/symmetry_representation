@@ -34,8 +34,13 @@ def get_time_reversal(*, orbitals, numeric):
         should be used.
     """
     dim = len(orbitals[0].position)
-    unity = np.eye(dim)
-    real_space_operator = RealSpaceOperator(rotation_matrix=unity)
+    if numeric:
+        unity = np.eye(dim)
+    else:
+        unity = sp.eye(dim, dim)
+    real_space_operator = RealSpaceOperator(
+        rotation_matrix=unity, numeric=numeric
+    )
     repr_matrix = _get_repr_matrix_impl(
         orbitals=orbitals,
         real_space_operator=real_space_operator,
@@ -212,7 +217,8 @@ def _pos_distance(pos1, pos2):
     """
     Returns the periodic distance between two positions.
     """
-    delta = np.array(pos1) - np.array(pos2)
+    delta = np.array(pos1).astype(float).flatten(
+    ) - np.array(pos2).astype(float).flatten()
     delta %= 1
     return la.norm(np.array(np.minimum(delta, 1 - delta)).astype(float))
 

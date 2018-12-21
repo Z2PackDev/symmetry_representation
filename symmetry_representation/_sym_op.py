@@ -60,8 +60,8 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
         Specifies whether the representation contains a complex conjugation.
     numeric : bool
         Specifies whether the symmetry operation contains a numeric or analytic
-        representation matrix. By default, this is determined by the type of the
-        passed matrix.
+        values. By default, this is determined by the type of the rotation
+        matrix.
 
     Attributes
     ----------
@@ -72,6 +72,7 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
     """
 
     HDF5_ATTRIBUTES = ['real_space_operator', 'repr']
+    HDF5_OPTIONAL = ['numeric']
 
     def __init__(
         self,
@@ -86,10 +87,15 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
         self.real_space_operator = RealSpaceOperator(
             rotation_matrix=rotation_matrix,
             translation_vector=translation_vector,
+            numeric=numeric
         )
         self.repr = Representation(
-            matrix=repr_matrix, has_cc=repr_has_cc, numeric=numeric
+            matrix=repr_matrix, has_cc=repr_has_cc, numeric=self.numeric
         )
+
+    @property
+    def numeric(self):
+        return self.real_space_operator.numeric
 
     @classmethod
     def from_real_space_operator(cls, *, real_space_operator, **kwargs):
@@ -220,21 +226,38 @@ class RealSpaceOperator(SimpleHDF5Mapping, types.SimpleNamespace):
         Describes the rotation matrix of the symmetry, in reduced coordinates
     translation_vector : array
         The translation vector of the symmetry.
+    numeric : bool
+        Specifies whether the symmetry operation contains a numeric or analytic
+        values. By default, this is determined by the type of the rotation
+        matrix.
     """
 
     HDF5_ATTRIBUTES = ['rotation_matrix', 'translation_vector']
+    HDF5_OPTIONAL = ['numeric']
 
-    def __init__(self, rotation_matrix, translation_vector=None):
-        rotation_matrix = np.array(rotation_matrix).astype(float)
+    def __init__(self, rotation_matrix, translation_vector=None, numeric=None):
+        if numeric is None:
+            numeric = not isinstance(rotation_matrix, sp.Matrix)
+        self.numeric = numeric
+        if numeric:
+            rotation_matrix = np.array(rotation_matrix).astype(float)
+        else:
+            rotation_matrix = sp.Matrix(rotation_matrix)
         n, m = rotation_matrix.shape
         if n != m:
             raise ValueError('The rotation matrix must be square.')
         self.rotation_matrix = rotation_matrix
 
         if translation_vector is None:
-            translation_vector = np.zeros(len(self.rotation_matrix))
+            if self.numeric:
+                translation_vector = np.zeros(n)
+            else:
+                translation_vector = sp.zeros(n, 1)
         else:
-            translation_vector = np.array(translation_vector).astype(float)
+            if self.numeric:
+                translation_vector = np.array(translation_vector).astype(float)
+            else:
+                translation_vector = sp.Matrix(translation_vector)
         if len(translation_vector) != n:
             raise ValueError(
                 'The length of the translation vector must match the matrix dimension.'
@@ -268,6 +291,10 @@ class RealSpaceOperator(SimpleHDF5Mapping, types.SimpleNamespace):
         """
         Apply symmetry operation to a vector in reduced real-space coordinates.
         """
+        if self.numeric:
+            r = np.array(r).astype(float)
+        else:
+            r = sp.Matrix(r)
         return self.rotation_matrix @ r + self.translation_vector
 
     @property
@@ -278,7 +305,10 @@ class RealSpaceOperator(SimpleHDF5Mapping, types.SimpleNamespace):
         """
         n, m = self.rotation_matrix.shape
         assert n == m
-        return np.allclose(self.rotation_matrix, np.eye(n))
+        if self.numeric:
+            return np.allclose(self.rotation_matrix, np.eye(n))
+        else:
+            return sp.eye(n, n).equals(self.rotation_matrix)
 
     @property
     def is_lattice_translation(self):
@@ -286,14 +316,26 @@ class RealSpaceOperator(SimpleHDF5Mapping, types.SimpleNamespace):
         Checks if the operation is a lattice translation, i.e. a pure translation
         where the translation vector is a lattice vector.
         """
-        return self.is_pure_translation and np.allclose(
-            self.translation_vector, np.round(self.translation_vector)
-        )
+        if not self.is_pure_translation:
+            return False
+        if self.numeric:
+            return np.allclose(
+                self.translation_vector, np.round(self.translation_vector)
+            )
+        else:
+            return self.translation_vector.equals(
+                sp.Matrix([x.round() for x in self.translation_vector])
+            )
 
     def __eq__(self, other):
-        return np.all(
-            self.rotation_matrix == other.rotation_matrix
-        ) and np.all(self.translation_vector == other.translation_vector)
+        if self.numeric:
+            return np.all(
+                self.rotation_matrix == other.rotation_matrix
+            ) and np.all(self.translation_vector == other.translation_vector)
+        else:
+            return self.rotation_matrix.equals(
+                other.rotation_matrix
+            ) and self.translation_vector.equals(other.translation_vector)
 
 
 @export

@@ -101,18 +101,34 @@ def test_time_reversal(orbitals, result_repr_matrix, numeric):
             result.repr.matrix,
             np.array(result_repr_matrix).astype(complex)
         )
+
+        assert isinstance(
+            result.real_space_operator.rotation_matrix, np.ndarray
+        )
+        assert np.allclose(
+            result.real_space_operator.rotation_matrix, np.eye(3)
+        )
+        assert isinstance(
+            result.real_space_operator.translation_vector, np.ndarray
+        )
+        assert np.allclose(
+            result.real_space_operator.translation_vector, np.zeros(3)
+        )
     else:
         assert isinstance(result.repr.matrix, sp.Matrix)
         assert result.repr.matrix == result_repr_matrix
+
+        assert isinstance(
+            result.real_space_operator.rotation_matrix, sp.Matrix
+        )
+        assert result.real_space_operator.rotation_matrix.equals(sp.eye(3, 3))
+        assert isinstance(
+            result.real_space_operator.translation_vector, sp.Matrix
+        )
+        assert result.real_space_operator.translation_vector.equals(
+            sp.zeros(3, 1)
+        )
     assert result.repr.has_cc
-    assert isinstance(result.real_space_operator.rotation_matrix, np.ndarray)
-    assert np.allclose(result.real_space_operator.rotation_matrix, np.eye(3))
-    assert isinstance(
-        result.real_space_operator.translation_vector, np.ndarray
-    )
-    assert np.allclose(
-        result.real_space_operator.translation_vector, np.zeros(3)
-    )
 
 
 @pytest.mark.parametrize(['orbitals', 'rotation_matrix', 'reference'], [

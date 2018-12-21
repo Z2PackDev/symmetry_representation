@@ -33,6 +33,7 @@ def _expr_to_vector(
     :param random_fct: Function creating random numbers on which the expression will be evaluated.
     """
     dim = len(basis)
+    assert dim > 0
     # create random values for the coordinates and evaluate
     # both the basis functions and the expression to generate
     # the linear equation to be solved
