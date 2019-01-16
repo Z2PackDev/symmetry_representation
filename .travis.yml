@@ -15,6 +15,7 @@ matrix:
 
 install:
   - pip install .[dev]
+  - pip install -U pytest
 
 script:
   - if [ "$TEST_TYPE" == "compliance" ] ; then pre-commit run --all-files ; fi
