@@ -50,7 +50,7 @@ setup(
         'Topic :: Scientific/Engineering :: Physics',
         'Development Status :: 4 - Beta'
     ],
-    license='GPL',
+    license='Apache',
     packages=[
         'symmetry_representation', 'symmetry_representation._get_repr_matrix'
     ],
