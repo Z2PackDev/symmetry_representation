@@ -26,6 +26,7 @@ setup(
     url='http://z2pack.ethz.ch/symmetry-representation',
     author='Dominik Gresch',
     author_email='greschd@gmx.ch',
+    license='Apache 2.0',
     description='Provides an interface to describe symmetry representations.',
     install_requires=[
         'numpy', 'sympy', 'fsc.export', 'fsc.hdf5-io>=0.5', 'h5py', 'pymatgen',
@@ -50,7 +51,6 @@ setup(
         'Topic :: Scientific/Engineering :: Physics',
         'Development Status :: 4 - Beta'
     ],
-    license='Apache',
     packages=[
         'symmetry_representation', 'symmetry_representation._get_repr_matrix'
     ],
