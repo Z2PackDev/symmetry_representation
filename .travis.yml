@@ -14,8 +14,8 @@ matrix:
       env: TEST_TYPE="compliance"
 
 install:
-  - pip install .[dev]
   - pip install -U pytest numpy
+  - pip install .[dev]
 
 script:
   - if [ "$TEST_TYPE" == "compliance" ] ; then pre-commit run --all-files ; fi
