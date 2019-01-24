@@ -50,13 +50,14 @@ def _spin_reps_numeric(rotation_matrix_cartesian):
     tr = np.trace(rot)
     det = np.round(np.linalg.det(rot), 5)
     if det == 1.:  # rotations
-        theta = np.arccos(0.5 * (tr - 1.))
+        theta = np.arccos(0.5 * (tr - 1.))  # pylint: disable=assignment-from-no-return,useless-suppression
         if theta != 0:
             n[0] = rot[2, 1] - rot[1, 2]
             n[1] = rot[0, 2] - rot[2, 0]
             n[2] = rot[1, 0] - rot[0, 1]
-            if np.round(np.linalg.norm(n),
-                        5) == 0.:  # theta = pi, that is C2 rotations
+            if np.round(
+                np.linalg.norm(n), 5
+            ) == 0.:  # theta = pi, that is C2 rotations
                 e, v = la.eig(rot)
                 n = v[:, list(np.round(e, 10)).index(1.)]
                 spin = np.round(D12(n[0], n[1], n[2], np.pi), 15)
@@ -66,7 +67,7 @@ def _spin_reps_numeric(rotation_matrix_cartesian):
         else:  # case of unity
             spin = D12(0, 0, 0, 0)
     elif det == -1.:  # improper rotations and reflections
-        theta = np.arccos(0.5 * (tr + 1.))
+        theta = np.arccos(0.5 * (tr + 1.))  # pylint: disable=assignment-from-no-return,useless-suppression
         if np.round(theta, 5) != np.round(np.pi, 5):
             n[0] = rot[2, 1] - rot[1, 2]
             n[1] = rot[0, 2] - rot[2, 0]
