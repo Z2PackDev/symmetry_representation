@@ -1,4 +1,6 @@
-# © 2017-2018, ETH Zurich, Institut für Theoretische Physik
+# -*- coding: utf-8 -*-
+
+# (c) 2017-2018, ETH Zurich, Institut fuer Theoretische Physik
 # Author: Dominik Gresch <greschd@gmx.ch>
 """
 Defines the command-line tool ``symmetry-repr``.

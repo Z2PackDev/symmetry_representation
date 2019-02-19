@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# © 2017-2018, ETH Zurich, Institut für Theoretische Physik
+# (c) 2017-2018, ETH Zurich, Institut fuer Theoretische Physik
 # Author: Dominik Gresch <greschd@gmx.ch>
 """
 Defines functions to determine if symmetries are compatible with a given structure.

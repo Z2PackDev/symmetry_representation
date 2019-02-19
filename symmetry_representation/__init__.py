@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# © 2017-2018, ETH Zurich, Institut für Theoretische Physik
+# (c) 2017-2018, ETH Zurich, Institut fuer Theoretische Physik
 # Author: Dominik Gresch <greschd@gmx.ch>
 """
 A tool for describing symmetry operations and their representations.
 """
 
-__version__ = '0.3.1'
+__version__ = '0.3.2'
 
 from . import io
 from ._sym_op import *
