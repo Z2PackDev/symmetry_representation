@@ -13,12 +13,12 @@ import symmetry_representation as sr
 
 @pytest.mark.parametrize(['real_space_op', 'vec', 'res'], [
     (
-        sr.RealSpaceOperator(np.eye(3), [0.1, 0.2, 0.3]), [0.2, 0.7, 0.1],
-        [0.3, 0.9, 0.4]
+        sr.RealSpaceOperator(np.eye(3), [0.1, 0.2, 0.3]), [0.2, 0.7, 0.1
+                                                           ], [0.3, 0.9, 0.4]
     ),
     (
-        sr.RealSpaceOperator([[0, 1], [1, 1]], [0.1, 0.2]), [0.3, 0.6],
-        [0.7, 1.1]
+        sr.RealSpaceOperator([[0, 1], [1, 1]], [0.1, 0.2]), [0.3, 0.6
+                                                             ], [0.7, 1.1]
     ),
 ])
 def test_apply(real_space_op, vec, res):

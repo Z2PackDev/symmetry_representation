@@ -15,10 +15,10 @@ import symmetry_representation as sr
 @pytest.mark.parametrize(
     ['mat_1', 'has_cc_1', 'mat_2', 'has_cc_2', 'mat_res', 'has_cc_res'],
     [
-        ([[0, 1], [1, 0]], False, [[0, 1], [1, 0]], True, [[1, 0], [0, 1]],
-         True),
-        ([[1, 0], [0, 1]], True, [[0, sp.I], [-sp.I, 0]], False,
-         [[0, -sp.I], [sp.I, 0]], True),
+        ([[0, 1], [1, 0]], False, [[0, 1], [1, 0]], True, [[1, 0], [0, 1]
+                                                           ], True),
+        ([[1, 0], [0, 1]], True, [[0, sp.I], [-sp.I, 0]
+                                  ], False, [[0, -sp.I], [sp.I, 0]], True),
     ]  # pylint: disable=too-many-arguments
 )
 def test_representation_mul(

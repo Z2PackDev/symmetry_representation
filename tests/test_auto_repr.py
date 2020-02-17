@@ -71,8 +71,9 @@ def test_auto_repr(sample):
     ('orbitals', 'result_repr_matrix'),
     [
         ([
-            sr.
-            Orbital(position=(0.1, 0.2, 0.3), function_string='1', spin=None)
+            sr.Orbital(
+                position=(0.1, 0.2, 0.3), function_string='1', spin=None
+            )
         ], sp.Matrix([[1]])),
         ([
             sr.Orbital(
@@ -85,8 +86,9 @@ def test_auto_repr(sample):
             )
         ], sp.Matrix([[0, -sp.I], [sp.I, 0]])),
         ([
-            sr.
-            Orbital(position=(0.1, 0.2, 0.3), function_string='x', spin=None)
+            sr.Orbital(
+                position=(0.1, 0.2, 0.3), function_string='x', spin=None
+            )
         ], sp.Matrix([[1]])),
     ],
 )
@@ -132,8 +134,8 @@ def test_time_reversal(orbitals, result_repr_matrix, numeric):
 
 
 @pytest.mark.parametrize(['orbitals', 'rotation_matrix', 'reference'], [
-    ([sr.Orbital(position=(0, 0, 0), function_string='1', spin=None)],
-     np.array([[0, 1, 0], [1, 0, 0], [0, 0, 1]]), sp.eye(1, 1)),
+    ([sr.Orbital(position=(0, 0, 0), function_string='1', spin=None)
+      ], np.array([[0, 1, 0], [1, 0, 0], [0, 0, 1]]), sp.eye(1, 1)),
     ([
         sr.Orbital(position=(0, 0, 0), function_string='x', spin=None),
         sr.Orbital(position=(0, 0, 0), function_string='y', spin=None)
@@ -164,8 +166,8 @@ def test_time_reversal(orbitals, result_repr_matrix, numeric):
     ([
         sr.Orbital(position=(0, 0, 0), function_string='1', spin=sr.SPIN_UP),
         sr.Orbital(position=(0, 0, 0), function_string='1', spin=sr.SPIN_DOWN)
-    ], np.array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]]),
-     sp.Matrix([[-sp.I, 0], [0, sp.I]])),
+    ], np.array([[-1, 0, 0], [0, -1, 0], [0, 0, 1]]
+                ), sp.Matrix([[-sp.I, 0], [0, sp.I]])),
     ([
         sr.Orbital(position=(0, 0, 0), function_string='1', spin=sr.SPIN_UP),
         sr.Orbital(position=(0, 0, 0), function_string='1', spin=sr.SPIN_DOWN)

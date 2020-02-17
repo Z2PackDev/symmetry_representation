@@ -172,12 +172,12 @@ def _get_repr_matrix_impl(  # pylint: disable=too-many-locals
     repr_matrix_numeric = np.array(repr_matrix).astype(complex)
     if not np.allclose(
         repr_matrix_numeric @ repr_matrix_numeric.conj().T,
-        np.eye(*repr_matrix_numeric.shape)
+        np.eye(*repr_matrix_numeric.shape)  # pylint: disable=not-an-iterable
     ):
         max_mismatch = np.max(
             np.abs(
                 repr_matrix_numeric @ repr_matrix_numeric.conj().T -
-                np.eye(*repr_matrix_numeric.shape)
+                np.eye(*repr_matrix_numeric.shape)  # pylint: disable=not-an-iterable
             )
         )
         raise ValueError(
