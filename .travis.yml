@@ -2,15 +2,16 @@ language: python
 cache: pip
 
 python:
-  - "3.5"
   - "3.6"
+  - "3.7"
+  - "3.8"
 
 env:
   - TEST_TYPE="test"
 
 matrix:
   include:
-    - python: 3.6
+    - python: 3.7
       env: TEST_TYPE="compliance"
 
 install:
