@@ -33,7 +33,7 @@ EXTRAS_REQUIRE['dev'] += EXTRAS_REQUIRE['doc']
 setup(
     name='symmetry-representation',
     version=VERSION,
-    url='http://z2pack.ethz.ch/symmetry-representation',
+    url='https://symmetry-representation.greschd.ch',
     author='Dominik Gresch',
     author_email='greschd@gmx.ch',
     license='Apache 2.0',
