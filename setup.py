@@ -5,14 +5,11 @@
 # Author: Dominik Gresch <greschd@gmx.ch>
 
 import re
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup, find_packages
 
 import sys
-if sys.version_info < (3, 5):
-    raise 'must use Python version 3.5 or higher'
+if sys.version_info < (3, 6):
+    raise 'must use Python version 3.6 or higher'
 
 README = """A tool to describe symmetry operations and their representation."""
 
@@ -23,8 +20,8 @@ with open('./symmetry_representation/__init__.py', 'r') as f:
 EXTRAS_REQUIRE = {
     'doc': ['sphinx', 'sphinx-rtd-theme', 'sphinx-click', 'ipython>=6.2'],
     'dev': [
-        'pytest', 'pytest-cov', 'yapf==0.25', 'pre-commit==1.11.1',
-        'prospector==1.1.6.*', 'pylint==2.1.*'
+        'pytest', 'pytest-cov', 'yapf==0.29', 'pre-commit',
+        'prospector==1.2.0', 'pylint==2.4.4'
     ]
 }
 
@@ -33,7 +30,7 @@ EXTRAS_REQUIRE['dev'] += EXTRAS_REQUIRE['doc']
 setup(
     name='symmetry-representation',
     version=VERSION,
-    url='http://z2pack.ethz.ch/symmetry-representation',
+    url='https://symmetry-representation.greschd.ch',
     author='Dominik Gresch',
     author_email='greschd@gmx.ch',
     license='Apache 2.0',
@@ -56,9 +53,7 @@ setup(
         'Topic :: Scientific/Engineering :: Physics',
         'Development Status :: 4 - Beta'
     ],
-    packages=[
-        'symmetry_representation', 'symmetry_representation._get_repr_matrix'
-    ],
+    packages=find_packages(),
     entry_points='''
         [console_scripts]
         symmetry-repr=symmetry_representation._cli:cli

@@ -53,7 +53,7 @@ def filter_symmetries(symmetries, lattice, output):
     click.echo("Loading structure from file '{}'...".format(lattice))
     structure = mg.Structure.from_file(lattice)
     click.echo("Filtering symmetries...")
-    filtered_symmetries = filter_compatible(symmetries, structure=structure)  # pylint: disable=assignment-from-no-return
+    filtered_symmetries = filter_compatible(symmetries, structure=structure)
     click.echo("Saving filtered symmetries to file '{}'...".format(output))
     io.save(filtered_symmetries, output)
     click.echo("Done!")

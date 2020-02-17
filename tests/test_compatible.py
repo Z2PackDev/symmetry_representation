@@ -61,9 +61,8 @@ def test_not_all_compatible(strained_structure, all_symmetries):  # pylint: disa
         return False
 
     for sym in all_symmetries:
-        assert sr.is_compatible(
-            structure=strained_structure, symmetry=sym
-        ) == check(sym)
+        assert sr.is_compatible(structure=strained_structure,
+                                symmetry=sym) == check(sym)
 
 
 def test_filter_compatible(unstrained_structure, all_symmetries):  # pylint: disable=redefined-outer-name

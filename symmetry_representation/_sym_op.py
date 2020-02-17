@@ -3,6 +3,7 @@
 
 # (c) 2017-2018, ETH Zurich, Institut fuer Theoretische Physik
 # Author: Dominik Gresch <greschd@gmx.ch>
+# pylint: disable=cyclic-import
 """
 Defines symmetry operations and groups.
 """
@@ -128,7 +129,7 @@ class SymmetryOperation(SimpleHDF5Mapping, types.SimpleNamespace):
             Determines whether a numeric (numpy) or analytic (sympy)
             representation matrix is constructed.
         """
-        from . import _get_repr_matrix
+        from . import _get_repr_matrix  # pylint: disable=import-outside-toplevel
         if kwargs.get('repr_has_cc', False):
             raise NotImplementedError
         repr_matrix = _get_repr_matrix.get_repr_matrix(
@@ -367,14 +368,15 @@ class Representation(SimpleHDF5Mapping, types.SimpleNamespace):
         if numeric:
             matrix = np.array(matrix).astype(complex)
             if not np.allclose(
-                matrix @ matrix.T.conjugate(), np.eye(matrix.shape[0])
+                matrix @ matrix.T.conjugate(),
+                np.eye(matrix.shape[0])  # pylint: disable=unsubscriptable-object
             ):
                 raise ValueError(
                     'Input matrix is not unitary: {}'.format(matrix)
                 )
         else:
             matrix = sp.Matrix(matrix)
-            if not sp.eye(*matrix.shape).equals(matrix @ matrix.H):  # pylint: disable=not-an-iterable
+            if not sp.eye(*matrix.shape).equals(matrix @ matrix.H):
                 raise ValueError(
                     'Input matrix is not unitary: {}'.format(matrix)
                 )

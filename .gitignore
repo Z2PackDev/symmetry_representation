@@ -27,3 +27,6 @@ tests/.coverage
 
 # Atom
 .ropeproject
+
+# VSCode
+.vscode

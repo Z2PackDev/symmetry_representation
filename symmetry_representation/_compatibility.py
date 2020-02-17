@@ -43,7 +43,7 @@ def is_compatible(*, structure, symmetry):
 
 @export
 @singledispatch
-def filter_compatible(symmetries, *, structure):  # pylint: disable=unused-argument
+def filter_compatible(symmetries, *, structure):
     """
     Returns the symmetries which are compatible with the given structure.
 
@@ -61,7 +61,7 @@ def filter_compatible(symmetries, *, structure):  # pylint: disable=unused-argum
 
 
 @filter_compatible.register(Iterable)
-def _(symmetries, *, structure):  # pylint: disable=missing-docstring
+def _(symmetries, *, structure):  # pylint: disable=missing-function-docstring
     filtered_syms = [
         filter_compatible(s, structure=structure) for s in symmetries
     ]
@@ -69,7 +69,7 @@ def _(symmetries, *, structure):  # pylint: disable=missing-docstring
 
 
 @filter_compatible.register(SymmetryOperation)
-def _(symmetry, *, structure):  # pylint: disable=missing-docstring
+def _(symmetry, *, structure):  # pylint: disable=missing-function-docstring
     if is_compatible(symmetry=symmetry, structure=structure):
         return symmetry
     else:
@@ -77,8 +77,8 @@ def _(symmetry, *, structure):  # pylint: disable=missing-docstring
 
 
 @filter_compatible.register(SymmetryGroup)
-def _(symmetry_group, *, structure):  # pylint: disable=missing-docstring
-    filtered_syms = filter_compatible(  # pylint: disable=assignment-from-no-return
+def _(symmetry_group, *, structure):  # pylint: disable=missing-function-docstring
+    filtered_syms = filter_compatible(
         symmetry_group.symmetries, structure=structure
     )
     if filtered_syms:

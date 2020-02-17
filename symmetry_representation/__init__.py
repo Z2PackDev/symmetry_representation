@@ -3,6 +3,7 @@
 
 # (c) 2017-2018, ETH Zurich, Institut fuer Theoretische Physik
 # Author: Dominik Gresch <greschd@gmx.ch>
+# pylint: disable=cyclic-import
 """
 A tool for describing symmetry operations and their representations.
 """
