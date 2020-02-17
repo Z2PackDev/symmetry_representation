@@ -5,10 +5,7 @@
 # Author: Dominik Gresch <greschd@gmx.ch>
 
 import re
-try:
-    from setuptools import setup
-except ImportError:
-    from distutils.core import setup
+from setuptools import setup, find_packages
 
 import sys
 if sys.version_info < (3, 5):
@@ -56,9 +53,7 @@ setup(
         'Topic :: Scientific/Engineering :: Physics',
         'Development Status :: 4 - Beta'
     ],
-    packages=[
-        'symmetry_representation', 'symmetry_representation._get_repr_matrix'
-    ],
+    packages=find_packages(),
     entry_points='''
         [console_scripts]
         symmetry-repr=symmetry_representation._cli:cli
