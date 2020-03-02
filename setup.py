@@ -36,7 +36,7 @@ setup(
     license='Apache 2.0',
     description='Provides an interface to describe symmetry representations.',
     install_requires=[
-        'numpy', 'sympy', 'fsc.export', 'fsc.hdf5-io>=0.5', 'h5py', 'pymatgen',
+        'numpy', 'sympy', 'fsc.export', 'fsc.hdf5-io>=0.6', 'h5py', 'pymatgen',
         'click>=7.0'
     ],
     python_requires=">=3.6",
@@ -54,8 +54,10 @@ setup(
         'Development Status :: 4 - Beta'
     ],
     packages=find_packages(),
-    entry_points='''
-        [console_scripts]
-        symmetry-repr=symmetry_representation._cli:cli
-    ''',
+    entry_points={
+        'console_scripts':
+        ['symmetry-repr = symmetry_representation._cli:cli'],
+        'fsc.hdf5_io.load':
+        ['symmetry_representation = symmetry_representation']
+    },
 )
