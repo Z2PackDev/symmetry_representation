@@ -8,7 +8,7 @@
 A tool for describing symmetry operations and their representations.
 """
 
-__version__ = '0.3.2'
+__version__ = '0.3.3'
 
 from . import io
 from ._sym_op import *
