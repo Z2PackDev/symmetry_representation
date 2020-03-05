@@ -46,7 +46,7 @@ Depending on the kind of symmetry operation, these representation matrices are e
 The :class:`.SymmetryOperation` and :class:`.SymmetryGroup` classes
 -------------------------------------------------------------------
 
-The main purpose of the symmetry-representation code is to provide classes which describe these symmetry operations and their representations. These can then be used by other codes, such as `TBmodels <http://z2pack.ethz.ch/tbmodels>`_ or `kdotp-symmetry <http://z2pack.ethz.ch/kdotp-symmetry>`_. It also provides helper functions which allow for more easily constructing such symmetry operations.
+The main purpose of the symmetry-representation code is to provide classes which describe these symmetry operations and their representations. These can then be used by other codes, such as `TBmodels <https://tbmodels.greschd.ch/>`_ or `kdotp-symmetry <https://kdotp-symmetry.greschd.ch>`_. It also provides helper functions which allow for more easily constructing such symmetry operations.
 
 Within symmetry-representation, symmetry operations are described using the :class:`.SymmetryOperation` class. This class has the following parameters:
 
@@ -141,7 +141,7 @@ And finally, we can use the symmetry group using the :meth:`.from_orbitals` meth
        ...:     full_group=True
        ...: )
 
-The ``numeric`` flag determines whether ``numpy`` arrays (``True``) or ``sympy`` matrices (``False``) are created. The former are suited for use with the `TBmodels <http://z2pack.ethz.ch/tbmodels>`_ code, while the latter should be used for `kdotp-symmetry <http://z2pack.ethz.ch/kdotp-symmetry>`_. Note that in order to create correct ``sympy`` matrices, the real space matrices should `also` be sympy matrices.
+The ``numeric`` flag determines whether ``numpy`` arrays (``True``) or ``sympy`` matrices (``False``) are created. The former are suited for use with the `TBmodels <https://tbmodels.greschd.ch>`_ code, while the latter should be used for `kdotp-symmetry <https://kdotp-symmetry.greschd.ch>`_. Note that in order to create correct ``sympy`` matrices, the real space matrices should `also` be sympy matrices.
 
 Additionally, there is a special helper function to create a representation of the time-reversal symmetry operation:
 
