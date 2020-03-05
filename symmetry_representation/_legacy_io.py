@@ -41,7 +41,7 @@ def _decode_iterable(hdf5_handle):
 def _decode_symgroup(hdf5_handle):
     return SymmetryGroup(
         symmetries=_decode_iterable(hdf5_handle['symmetries']),
-        full_group=hdf5_handle['full_group'].value
+        full_group=hdf5_handle['full_group'][()]
     )
 
 
@@ -57,5 +57,5 @@ def _decode_symop(hdf5_handle):
 def _decode_repr(hdf5_handle):
     return Representation(
         matrix=np.array(hdf5_handle['matrix']),
-        has_cc=hdf5_handle['has_cc'].value
+        has_cc=hdf5_handle['has_cc'][()]
     )
