@@ -47,9 +47,14 @@ def _spin_reps_numeric(rotation_matrix_cartesian):
                           np.cos(phi / 2.) + 1j * n * np.sin(phi / 2.)]])
 
     n = np.zeros(3)
-    tr = np.trace(rot)
+    tr_unclipped = np.trace(rot)
     det = np.round(np.linalg.det(rot), 5)
     if det == 1.:  # rotations
+        tr = max(min(tr_unclipped, 3), -1)
+        if not np.isclose(tr, tr_unclipped):
+            raise ValueError(
+                f"Rotation matrix has an invalid trace {tr_unclipped}."
+            )
         theta = np.arccos(0.5 * (tr - 1.))  # pylint: disable=assignment-from-no-return,useless-suppression
         if theta != 0:
             n[0] = rot[2, 1] - rot[1, 2]
@@ -67,6 +72,11 @@ def _spin_reps_numeric(rotation_matrix_cartesian):
         else:  # case of unity
             spin = D12(0, 0, 0, 0)
     elif det == -1.:  # improper rotations and reflections
+        tr = max(min(tr_unclipped, 1), -3)
+        if not np.isclose(tr, tr_unclipped):
+            raise ValueError(
+                f"Rotation matrix has an invalid trace {tr_unclipped}."
+            )
         theta = np.arccos(0.5 * (tr + 1.))  # pylint: disable=assignment-from-no-return,useless-suppression
         if np.round(theta, 5) != np.round(np.pi, 5):
             n[0] = rot[2, 1] - rot[1, 2]
